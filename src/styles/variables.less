@@ -2,7 +2,7 @@
   color-scheme: ht-cms;
   /* 本项目自定义变量 */
   // @theme-color: rgb(88, 83, 241);
-  @theme-color: rgb(55, 179, 131); // type=parimary 颜色
+  @theme-color: rgb(76, 76, 239); // type=parimary 颜色
   --ht--blue-color: #3096d9;
   --ht--bg-color: @theme-color;
   --ht--bg-color-light: rgba(55, 179, 131, 0.3);
@@ -18,11 +18,15 @@
   --el-color-primary-light-2: lighten(@theme-color, 20%);
   --el-color-primary-light-3: lighten(@theme-color, 20%); // 按钮hover颜色
   --el-color-primary-dark-2: darken(@theme-color, 20%);
-
-  --ht-color-warning: var(--el-color-warning); // 警告 对应type=warning
-  --ht-color-danger: var(--el-color-danger); // 危险 对应type=danger
-  --ht-color-error: var(--el-color-error); // 错误
-  --ht-color-info: var(--el-color-info); // 灰色信息 对应type=info
+  --el-bg-color-overlay: var(--vicom-bg-color);
+  --el-input-text-color: #ffffff;
+  --el-fill-color-blank: var(--vicom-bg-color);
+  --el-text-color-regular: #ffffff;
+  --vicom-bg-color: #151517;
+  --vicom-icon-color: #98989b;
+  --vicom-icon-active-color: #ffffff;
+  --vicom-primary: rgb(76, 76, 239);
+  --vicom-border-color: #39393a;
 }
 
 .el-table {
