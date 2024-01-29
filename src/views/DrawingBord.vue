@@ -4,8 +4,8 @@
     <div class="bottom">
       <HandlePanel class="handle"></HandlePanel>
 
-      <main class="main" ref="maicRef" :class="handle">
-        <canvas ref="canvasDom" class="canvas"></canvas>
+      <main class="main" ref="maicRef">
+        <canvas ref="canvasDom" class="canvas">抱歉，您的浏览器暂不支持本项目</canvas>
       </main>
 
       <div class="tool">工具栏</div>
@@ -19,6 +19,7 @@ import VicomHeader from '@/Layout/VicomHeader.vue'
 import HandlePanel from '@/Layout/HandlePanel.vue'
 import { onMounted, ref } from 'vue'
 
+import { initCanvas } from '@/hooks/draw.js'
 const canvasDom = ref('')
 const maicRef = ref('')
 let canvas
@@ -30,30 +31,15 @@ let mainArea
 let painting = false
 let EraserEnabled = false
 let startPoint
+
 onMounted(() => {
+  initCanvas(canvasDom.value)
+
   mainArea = maicRef.value
   canvas = canvasDom.value
   wh()
 
-  ctx = canvas.getContext('2d')
-
-  ctx.imageSmoothingEnabled = false
-  ctx.mozImageSmoothingEnabled = false
-  ctx.webkitImageSmoothingEnabled = false
-  ctx.msImageSmoothingEnabled = false
   drawBackground()
-  canvas.onmousedown = function (e) {
-    ctx.globalAlpha = 1
-    let x = e.offsetX
-    let y = e.offsetY
-    painting = true
-    if (EraserEnabled) {
-      ctx.clearRect(x - 15, y - 15, 30, 30)
-    }
-    startPoint = { x: x, y: y }
-
-    drawLine(startPoint.x, startPoint.y, startPoint.x, startPoint.y)
-  }
 
   var scaleFactor = 1.0
   // canvas.addEventListener('wheel', function (event) {
@@ -74,24 +60,6 @@ onMounted(() => {
   //   var y = event.layerY
   //   ctx.drawImage(canvas, Math.abs(x - 5), Math.abs(y - 5), 10, 10, 0, 0, 200, 200)
   // })
-
-  canvas.onmousemove = function (e) {
-    let x = e.offsetX
-    let y = e.offsetY
-    let newPoint = { x: x, y: y }
-    if (painting) {
-      if (EraserEnabled) {
-        ctx.clearRect(x - 15, y - 15, 30, 30)
-      } else {
-        drawLine(startPoint.x, startPoint.y, newPoint.x, newPoint.y)
-      }
-      startPoint = newPoint
-    }
-  }
-
-  canvas.onmouseup = function () {
-    painting = false
-  }
 })
 
 function drawBackground(scaleFactor = 1) {

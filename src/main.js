@@ -24,7 +24,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 // 注册icon
 import 'virtual:svg-icons-register'
 import SvgIcon from '@/components/SvgIcon/SvgIcon.vue'
-console.log(SvgIcon)
+
 app.component('SvgIcon', SvgIcon)
 
 app.mount('#app')

@@ -23,12 +23,11 @@
 
 <script setup>
 import { ref } from 'vue'
-
+import { initPencil } from '@/hooks/draw.js'
 const colorPicker = ref('')
 const color = ref('#000000')
 
 function showColorPicker() {
-  // if (colorPicker.value.__v_skip) return
   console.log(colorPicker.value)
   colorPicker.value.show()
 }
