@@ -36,7 +36,7 @@
     </span>
 
     <span class="pointer">
-      <SvgIcon name="eraser" color="#ffffff"></SvgIcon>
+      <SvgIcon name="eraser" @click="earser" color="#ffffff"></SvgIcon>
     </span>
 
     <span class="pointer">
@@ -52,7 +52,7 @@
 <script setup>
 import VicomTooltip from '@/components/VicomTooltip/VicomTooltip.vue'
 import { ref } from 'vue'
-import { initPencil, setColor, setwidth } from '@/hooks/draw.js'
+import { initPencil, setColor, setwidth, initEarser } from '@/hooks/draw.js'
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/antd.css'
 
@@ -77,6 +77,10 @@ function pencil() {
   // pencilTooltip.value.onClose()
   pencilEdit.value = true
   initPencil()
+}
+
+function earser() {
+  initEarser()
 }
 </script>
 <style lang="less" scoped>

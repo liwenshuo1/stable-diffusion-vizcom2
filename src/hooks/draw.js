@@ -1,4 +1,4 @@
-import { fabric } from 'fabric'
+import { fabric } from 'fabric-with-erasing'
 
 let canvas
 
@@ -14,7 +14,10 @@ export function initCanvas(canvasDom, opt) {
 }
 
 export function initPencil() {
+  console.log(canvas.freeDrawingBrush)
   canvas.isDrawingMode = true
+  let pencilBrush = new fabric.PencilBrush(canvas)
+  canvas.freeDrawingBrush = pencilBrush
   setColor(color)
   // pencil.width = 30
 }
@@ -34,4 +37,10 @@ export function setwidth(val) {
     // 如果是绘画模式，同时设置画笔颜色
     canvas.freeDrawingBrush.width = pencliWidth
   }
+}
+
+export function initEarser() {
+  canvas.isDrawingMode = true // 进入绘画模式
+  canvas.freeDrawingBrush = new fabric.EraserBrush(canvas) // 使用橡皮擦画笔
+  canvas.freeDrawingBrush.width = 10 // 设置画笔粗细为 10
 }
