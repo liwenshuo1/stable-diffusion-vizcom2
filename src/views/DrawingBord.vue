@@ -18,48 +18,24 @@
 import VicomHeader from '@/Layout/VicomHeader.vue'
 import HandlePanel from '@/Layout/HandlePanel.vue'
 import { onMounted, ref } from 'vue'
-
+import { fabric } from 'fabric'
 import { initCanvas } from '@/hooks/draw.js'
 const canvasDom = ref('')
 const maicRef = ref('')
-let canvas
 let ctx
 
 let handle = ref('pencil')
 
 let mainArea
-let painting = false
-let EraserEnabled = false
-let startPoint
 
 onMounted(() => {
-  initCanvas(canvasDom.value)
-
   mainArea = maicRef.value
-  canvas = canvasDom.value
-  wh()
 
-  drawBackground()
+  const options = {}
+  options.width = mainArea.offsetWidth
+  options.height = mainArea.offsetHeight
 
-  var scaleFactor = 1.0
-  // canvas.addEventListener('wheel', function (event) {
-  //   event.preventDefault()
-
-  //   // 根据缩放方向调整缩放比例
-  //   if (event.deltaY < 0) {
-  //     scaleFactor *= 1.1 // 放大
-  //   } else {
-  //     scaleFactor /= 1.1 // 缩小
-  //   }
-
-  //   // 限制最小和最大缩放比例
-  //   scaleFactor = Math.max(0.1, Math.min(scaleFactor, 3.0))
-
-  //   // 重新绘制
-  //   var x = event.layerX
-  //   var y = event.layerY
-  //   ctx.drawImage(canvas, Math.abs(x - 5), Math.abs(y - 5), 10, 10, 0, 0, 200, 200)
-  // })
+  initCanvas(canvasDom.value, options)
 })
 
 function drawBackground(scaleFactor = 1) {
@@ -77,33 +53,6 @@ function drawBackground(scaleFactor = 1) {
   //   }
   // }
 }
-
-function drawLine(xStart, yStart, xEnd, yEnd) {
-  //开始绘制路径
-  ctx.beginPath()
-  ctx.lineCap = 'round'
-  ctx.lineJoin = 'round'
-  //线宽
-  ctx.lineWidth = 5
-  //起始位置
-  ctx.moveTo(xStart, yStart)
-  //停止位置
-  ctx.lineTo(xEnd, yEnd)
-  //描绘线路
-  ctx.stroke()
-  //结束绘制
-  ctx.closePath()
-}
-
-function wh() {
-  const width = mainArea.offsetWidth
-  const height = mainArea.offsetHeight
-  canvas.width = width
-  canvas.height = height
-}
-window.addEventListener('resize', () => {
-  wh()
-})
 </script>
 <style lang="less" scoped>
 .DB-container {

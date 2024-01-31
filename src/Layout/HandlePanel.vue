@@ -1,10 +1,38 @@
 <template>
   <div class="edit-warp">
-    <span class="color-picker pointer" @click="showColorPicker"></span>
+    <!-- <span class="color-picker pointer" @click="showColorPicker"></span> -->
     <el-color-picker ref="colorPicker" v-model="color" @change="checkColor" />
+    <span class="pointer">
+      <el-popover
+        v-model="pencilEdit"
+        :teleported="false"
+        transition="none"
+        :hide-after="0"
+        placement="right"
+        :offset="16"
+        :width="200"
+        trigger="click">
+        <template #reference>
+          <!-- <el-tooltip
+            :hide-after="0"
+            ref="pencilTooltip"
+            class="box-item"
+            :offset="16"
+            effect="dark"
+            content="铅笔(B)"
+            placement="right"> -->
+          <SvgIcon name="cc-pencil" @click="pencil" color="#ffffff"></SvgIcon>
+          <!-- </el-tooltip> -->
+        </template>
+        <template #default>
+          <div class="pencil-card">
+            <span>铅笔设置</span>
 
-    <span class="pointer" @click="initPencil">
-      <SvgIcon name="cc-pencil" color="#ffffff"></SvgIcon>
+            <!-- https://nightcatsama.github.io/vue-slider-component/#/api/slots -->
+            <VueSlider @change="changePencilSize" :dotSize="18" tooltip="none" v-model="pencilWidth"></VueSlider>
+          </div>
+        </template>
+      </el-popover>
     </span>
 
     <span class="pointer">
@@ -22,14 +50,33 @@
 </template>
 
 <script setup>
+import VicomTooltip from '@/components/VicomTooltip/VicomTooltip.vue'
 import { ref } from 'vue'
-import { initPencil } from '@/hooks/draw.js'
+import { initPencil, setColor, setwidth } from '@/hooks/draw.js'
+import VueSlider from 'vue-slider-component'
+import 'vue-slider-component/theme/antd.css'
+
 const colorPicker = ref('')
 const color = ref('#000000')
-
+function checkColor(value) {
+  setColor(value)
+}
 function showColorPicker() {
   console.log(colorPicker.value)
   colorPicker.value.show()
+}
+
+const pencilEdit = ref(false)
+const pencilTooltip = ref('')
+const pencilWidth = ref(10)
+
+function changePencilSize(val) {
+  setwidth(val)
+}
+function pencil() {
+  // pencilTooltip.value.onClose()
+  pencilEdit.value = true
+  initPencil()
 }
 </script>
 <style lang="less" scoped>
@@ -52,19 +99,22 @@ function showColorPicker() {
   }
 }
 
-// 覆盖elementplus样式
-:deep(.el-popper__arrow) {
-  display: none !important;
-}
-:deep(.el-popover) {
-  --el-popover-border-radius: 10px;
-}
+// // 覆盖elementplus样式
+// :deep(.el-popper__arrow) {
+//   display: none !important;
+// }
+// :deep(.el-popover) {
+//   --el-popover-border-radius: 10px;
+// }
 
-:deep(.el-tooltip__trigger) {
-  display: none;
-}
+// :deep(.el-tooltip__trigger) {
+//   display: none;
+// }
 
 :global(.el-color-picker__panel) {
-  inset: 55px auto auto 5px !important;
+  inset: 55px auto auto 50px !important;
+}
+
+.custom-class {
 }
 </style>

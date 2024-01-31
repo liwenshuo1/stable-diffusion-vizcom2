@@ -24,8 +24,6 @@
 
 <script setup>
 import { nextTick, onMounted, ref } from 'vue'
-
-function checkColor(value) {}
 </script>
 <style lang="less" scoped>
 .header {
