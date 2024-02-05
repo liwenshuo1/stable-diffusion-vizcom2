@@ -35,13 +35,13 @@ export default defineConfig({
   server: {
     host: true,
     port: 10527,
-    open: true
-    // proxy: {
-    //   '^/api': {
-    //     target: debugUrl,
-    //     changeOrigin: true,
-    //     rewrite: (path) => path.replace(/^\/api/, '')
-    //   }
-    // }
+    open: true,
+    proxy: {
+      '^/api': {
+        target: 'http://127.0.0.1:7860',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
   }
 })
