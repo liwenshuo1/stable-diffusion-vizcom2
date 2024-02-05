@@ -32,7 +32,7 @@ import { initCanvas, addLayer } from '@/hooks/draw.js'
 const canvasDom = ref('')
 const maicRef = ref('')
 
-const activeName = ref('sdDes')
+const activeName = ref('layers')
 
 let ctx
 

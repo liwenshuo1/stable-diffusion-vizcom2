@@ -47,8 +47,8 @@
 
 <script setup>
 import draggable from 'vuedraggable-es'
-import { addLayer, layers, setActiveLayer, moveLayerToIndex, addLayerWithImage } from '@/hooks/draw.js'
-import { ref, reactive } from 'vue'
+import { addLayer, layers, setActiveLayer, moveLayerToIndex, addLayerWithImage, canvas } from '@/hooks/draw.js'
+import { ref, reactive, watch } from 'vue'
 
 const fileList = ref([])
 function onChange(file, b, c) {
@@ -77,9 +77,17 @@ function add() {
 }
 
 const currentIndex = ref(0)
+
+watch(currentIndex, (newval) => {
+  setActiveLayer(newval)
+})
+
 function setActive(index) {
-  currentIndex.value = index
-  setActiveLayer(index)
+  if (index === currentIndex.value) {
+    setActiveLayer(index)
+  } else {
+    currentIndex.value = index
+  }
 }
 
 const isDragging = ref(false)
@@ -90,7 +98,8 @@ const dragOptions = reactive({
   ghostClass: 'ghost'
 })
 function endDrag(val, aaa) {
-  console.log(val)
+  const activeindex = layers.value.findIndex((item) => item.id === canvas.getActiveObject().id)
+  currentIndex.value = activeindex
   moveLayerToIndex(val.newIndex)
   isDragging.value = false
 }

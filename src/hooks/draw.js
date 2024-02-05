@@ -1,7 +1,7 @@
 import { fabric } from 'fabric-with-erasing'
 import { v4 as uuidv4 } from 'uuid'
 import { ref } from 'vue'
-let canvas
+export let canvas
 
 let color = '#000000'
 let pencliWidth = 10
@@ -74,7 +74,9 @@ function drawOnActiveLayer(object) {
 }
 
 export function moveimage() {
-  alert(123123)
+  const activeindex = layers.value.findIndex((item) => item.id === activeLayer.id)
+  setActiveLayer(activeindex)
+  canvas.isDrawingMode = false
 }
 
 // 创建图层数组
@@ -106,7 +108,7 @@ export function setActiveLayer(index) {
 
     canvas.on('after:render', function () {
       activeLayer = canvas.getActiveObject()
-      canvas.isDrawingMode = false
+      // canvas.isDrawingMode = false
       // 可以在这里执行后续的操作
       // ...
       reslove()
@@ -126,22 +128,17 @@ export function setLayerOrder() {
 
 // 移动图层到指定层级
 export function moveLayerToIndex(targetIndex, id) {
-  console.log(layers)
-
-  layers.value.forEach(function (layer) {
-    canvas.remove(layer)
-  })
-
-  layers.value.forEach(function (layer) {
-    canvas.add(layer)
-  })
+  // layers.value.forEach(function (layer) {
+  //   canvas.remove(layer)
+  // })
+  // layers.value.forEach(function (layer) {
+  //   canvas.add(layer)
+  // })
   canvas.requestRenderAll()
 }
 
 export function addLayerWithImage(base64Image) {
-  console.log(base64Image)
   fabric.Image.fromURL(base64Image, function (img) {
-    console.log('img', img)
     addLayer(img)
     canvas.requestRenderAll()
   })
