@@ -18,13 +18,22 @@
       <el-divider />
       <el-button style="width: 100%" tag="div" type="primary" @click="create">确定</el-button>
     </div>
+
+    <div style="display: none">
+      <ul id="images">
+        <li v-for="item in createImgList"><img :src="item" alt="Picture 1" /></li>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script setup>
+import 'viewerjs/dist/viewer.css'
+import Viewer from 'viewerjs'
 import { request } from '@/utils/request.js'
-import { ref } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
 import { ElLoading } from 'element-plus'
+
 // {
 //   "enable_hr": false,                 // 开启高清hr
 //   "denoising_strength": 0,            // 降噪强度
@@ -74,6 +83,39 @@ import { ElLoading } from 'element-plus'
 //   "alwayson_scripts": {}               // alwayson配置
 // }
 
+let gallery
+
+function createGallery() {
+  gallery = new Viewer(document.getElementById('images'), {
+    toolbar: {
+      zoomIn: 4,
+      zoomOut: 4,
+      oneToOne: 4,
+      reset: 4,
+      prev: 4,
+      play: {
+        show: 0,
+        size: 'large'
+      },
+      next: 4,
+      rotateLeft: 4,
+      rotateRight: 4,
+      flipHorizontal: 4,
+      flipVertical: 4,
+      download: function () {
+        const a = document.createElement('a')
+        a.href = gallery.image.src
+        a.download = gallery.image.alt
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+      }
+    }
+  })
+}
+
+onMounted(() => {})
+
 const url = '/api'
 
 const form = ref({
@@ -82,7 +124,12 @@ const form = ref({
   steps: 5
 })
 
+const createImgList = ref()
 function create() {
+  // createGallery()
+  // gallery.show()
+  // return
+
   let loading = ElLoading.service({
     lock: true,
     text: '图片生成中',
@@ -93,12 +140,18 @@ function create() {
       ...form.value
     })
     .then((res) => {
+      createImgList.value = res.images.map((item) => `data:image/jpeg;base64,${item}`)
+      console.log(createImgList.value)
       console.log('res, rees', res)
       loading.close()
+      nextTick(() => {
+        createGallery()
+        gallery.show()
+      })
     })
 }
 </script>
-<style lang="less" scoped>
+<style lang="less">
 .sd-des-warp {
   .title {
     padding: 20px;
@@ -110,5 +163,11 @@ function create() {
     padding: 20px;
     font-weight: 700;
   }
+}
+
+.viewer-download {
+  background-image: url('../assets/download.png');
+  background-size: 20px 20px;
+  background-position: center;
 }
 </style>
