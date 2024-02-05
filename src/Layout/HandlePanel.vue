@@ -40,7 +40,7 @@
     </span>
 
     <span class="pointer">
-      <SvgIcon name="move" color="#ffffff"></SvgIcon>
+      <SvgIcon name="move" @click="moveLayer" color="#ffffff"></SvgIcon>
     </span>
 
     <span class="pointer">
@@ -52,7 +52,7 @@
 <script setup>
 import VicomTooltip from '@/components/VicomTooltip/VicomTooltip.vue'
 import { ref } from 'vue'
-import { initPencil, setColor, setwidth, initEarser } from '@/hooks/draw.js'
+import { initPencil, setColor, setwidth, initEarser, moveimage } from '@/hooks/draw.js'
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/antd.css'
 
@@ -81,6 +81,10 @@ function pencil() {
 
 function earser() {
   initEarser()
+}
+
+function moveLayer() {
+  moveimage()
 }
 </script>
 <style lang="less" scoped>

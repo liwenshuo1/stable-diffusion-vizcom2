@@ -1,11 +1,18 @@
 <template>
-  <svg aria-hidden="true" class="cp-icon" width="24" height="24">
+  <svg aria-hidden="true" class="cp-icon" :width="props.size" :height="props.size">
     <use :href="`#icon-${name}`" />
   </svg>
 </template>
 
 <script setup>
-defineProps(['name'])
+const props = defineProps({
+  name: {},
+  size: {
+    default() {
+      return 24
+    }
+  }
+})
 </script>
 
 <style lang="less">

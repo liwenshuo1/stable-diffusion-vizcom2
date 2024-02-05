@@ -8,24 +8,32 @@
         <canvas ref="canvasDom" class="canvas">抱歉，您的浏览器暂不支持本项目</canvas>
       </main>
 
-      <div class="tool">工具栏</div>
-      <aside class="aside">侧边栏</aside>
+      <div class="tool">
+        <!-- <div>ai绘图</div> -->
+        <Layers />
+      </div>
+
+      <aside class="aside">
+        <SvgIcon class="pointer" name="create-img" @click="pencil" color="#ffffff"></SvgIcon>
+        <SvgIcon class="pointer" name="layers" @click="pencil" color="#ffffff"></SvgIcon>
+      </aside>
     </div>
   </div>
 </template>
 
 <script setup>
+import Layers from '@/Layout/Layers.vue'
 import VicomHeader from '@/Layout/VicomHeader.vue'
 import HandlePanel from '@/Layout/HandlePanel.vue'
 import { onMounted, ref } from 'vue'
 import { fabric } from 'fabric'
-import { initCanvas } from '@/hooks/draw.js'
+import { initCanvas, addLayer } from '@/hooks/draw.js'
 const canvasDom = ref('')
 const maicRef = ref('')
 let ctx
 
 let handle = ref('pencil')
-
+function pencil() {}
 let mainArea
 
 onMounted(() => {
@@ -85,17 +93,22 @@ function drawBackground(scaleFactor = 1) {
 
   .tool {
     flex: 2;
-    // display: none;
+    padding: 20px;
     background-color: var(--vicom-bg-color);
     border-top: 1px solid var(--vicom-border-color);
     border-right: 1px solid var(--vicom-border-color);
   }
 
   .aside {
+    padding-top: 24px;
     width: 50px;
     // grid-column: 3 / 4;
     background-color: var(--vicom-bg-color);
     border-top: 1px solid var(--vicom-border-color);
+    display: grid;
+    grid-template-rows: repeat(auto-fill, 24px);
+    gap: 24px;
+    justify-content: center;
   }
   .canvas {
     // background-color: red;
