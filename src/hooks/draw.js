@@ -80,7 +80,7 @@ export function moveimage() {
 // 创建图层数组
 export let layers = ref([])
 // 添加新图层函数
-export function addLayer() {
+export function addLayer(img) {
   let layer = new fabric.Group([], {
     width: canvas.width,
     height: canvas.height,
@@ -90,6 +90,10 @@ export function addLayer() {
   })
   layers.value.push(layer)
   canvas.add(layer)
+  if (img) {
+    layer.addWithUpdate(img)
+    canvas.requestRenderAll()
+  }
 }
 
 let activeLayer
@@ -132,4 +136,13 @@ export function moveLayerToIndex(targetIndex, id) {
     canvas.add(layer)
   })
   canvas.requestRenderAll()
+}
+
+export function addLayerWithImage(base64Image) {
+  console.log(base64Image)
+  fabric.Image.fromURL(base64Image, function (img) {
+    console.log('img', img)
+    addLayer(img)
+    canvas.requestRenderAll()
+  })
 }

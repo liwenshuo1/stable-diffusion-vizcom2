@@ -5,6 +5,15 @@
       <span style="padding-left: 10px">图层</span>
     </div>
     <div class="edit">
+      <el-upload
+        v-model:file-list="fileList"
+        :on-change="onChange"
+        :show-file-list="false"
+        class="upload-demo"
+        :auto-upload="false"
+        action="#">
+        <SvgIcon :size="16" class="pointer" name="import-img" color="#ffffff"></SvgIcon>
+      </el-upload>
       <SvgIcon @click="add" :size="16" class="pointer" name="plus" color="#ffffff"></SvgIcon>
     </div>
 
@@ -38,8 +47,30 @@
 
 <script setup>
 import draggable from 'vuedraggable-es'
-import { addLayer, layers, setActiveLayer, moveLayerToIndex } from '@/hooks/draw.js'
+import { addLayer, layers, setActiveLayer, moveLayerToIndex, addLayerWithImage } from '@/hooks/draw.js'
 import { ref, reactive } from 'vue'
+
+const fileList = ref([])
+function onChange(file, b, c) {
+  console.log(file)
+  getBase64(file.raw).then((res) => {
+    addLayerWithImage(res)
+  })
+}
+
+function getBase64(file) {
+  return new Promise(function (resolve, reject) {
+    let reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = function (event) {
+      const base64String = event.target.result
+      resolve(base64String)
+    }
+    reader.onerror = function (error) {
+      reject(error)
+    }
+  })
+}
 
 function add() {
   addLayer()
@@ -76,9 +107,10 @@ function endDrag(val, aaa) {
   .edit {
     padding: 20px;
     padding-bottom: 0;
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 30px);
+    align-content: center;
     height: 40px;
-    align-items: center;
   }
   .layers-content {
     margin-top: 20px;
