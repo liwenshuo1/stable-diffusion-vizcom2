@@ -17,6 +17,7 @@
     "fabric-with-erasing": "^1.0.1",
     "pinia": "^2.1.7",
     "uuid": "^9.0.1",
+    "viewerjs": "^1.11.6",
     "vue": "^3.3.11",
     "vue-router": "^4.2.5",
     "vue-slider-component": "^4.1.0-beta.7",

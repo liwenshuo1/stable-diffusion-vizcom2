@@ -9,19 +9,20 @@
       </main>
 
       <div class="tool">
-        <!-- <div>ai绘图</div> -->
-        <Layers />
+        <SdDes v-if="activeName === 'sdDes'"></SdDes>
+        <Layers v-if="activeName === 'layers'" />
       </div>
 
       <aside class="aside">
-        <SvgIcon class="pointer" name="create-img" @click="pencil" color="#ffffff"></SvgIcon>
-        <SvgIcon class="pointer" name="layers" @click="pencil" color="#ffffff"></SvgIcon>
+        <SvgIcon class="pointer" name="create-img" @click="activeName = 'sdDes'" color="#ffffff"></SvgIcon>
+        <SvgIcon class="pointer" name="layers" @click="activeName = 'layers'" color="#ffffff"></SvgIcon>
       </aside>
     </div>
   </div>
 </template>
 
 <script setup>
+import SdDes from '@/Layout/SdDes.vue'
 import Layers from '@/Layout/Layers.vue'
 import VicomHeader from '@/Layout/VicomHeader.vue'
 import HandlePanel from '@/Layout/HandlePanel.vue'
@@ -30,6 +31,9 @@ import { fabric } from 'fabric'
 import { initCanvas, addLayer } from '@/hooks/draw.js'
 const canvasDom = ref('')
 const maicRef = ref('')
+
+const activeName = ref('sdDes')
+
 let ctx
 
 let handle = ref('pencil')
