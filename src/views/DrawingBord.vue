@@ -80,6 +80,8 @@ onMounted(() => {
   }
 
   .tool {
+    height: calc(100vh - 50px);
+    overflow-y: scroll;
     flex: 2.5;
     background-color: var(--vicom-bg-color);
     border-top: 1px solid var(--vicom-border-color);

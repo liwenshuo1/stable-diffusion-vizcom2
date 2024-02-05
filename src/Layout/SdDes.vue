@@ -16,6 +16,14 @@
         <el-radio :label="4">4</el-radio>
       </el-radio-group>
       <el-divider />
+      <div style="margin-bottom: 10px">图片生成步数</div>
+      <el-radio-group v-model="form.steps">
+        <el-radio :label="5">5</el-radio>
+        <el-radio :label="25">25</el-radio>
+        <el-radio :label="50">50</el-radio>
+      </el-radio-group>
+      <el-divider />
+
       <el-button style="width: 100%" tag="div" type="primary" @click="create">确定</el-button>
     </div>
 
