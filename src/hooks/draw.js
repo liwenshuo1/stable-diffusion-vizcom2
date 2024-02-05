@@ -15,45 +15,14 @@ export async function initCanvas(canvasDom, opt) {
   await setActiveLayer(0)
   drawGridOnLayer(activeLayer)
   function drawGridOnLayer(layer) {
-    console.log('layer', layer)
-    // console.log(activeLayer)
-    // console.log(layer.width)
-    // console.log(layer.height)
-    var gridSize = 20 // 每个格子的大小
-    var numCols = Math.ceil(layer.width / gridSize)
-    var numRows = Math.ceil(layer.height / gridSize)
-
-    // for (var i = 0; i < numCols; i++) {
-    //   for (var j = 0; j < numRows; j++) {
-    //     var rect = new fabric.Rect({
-    //       left: i * gridSize,
-    //       top: j * gridSize,
-    //       width: gridSize,
-    //       height: gridSize,
-    //       fill: (i + j) % 2 === 0 ? 'lightgray' : 'white',
-    //       selectable: false,
-    //       evented: false
-    //     })
-    //     layer.addWithUpdate(rect)
-    //   }
-    // }
-
-    var square = new fabric.Rect({
-      left: 50,
-      top: 50,
-      width: 50,
-      height: 50,
-      fill: 'blue',
-      selectable: false,
-      evented: false
-    })
-    layer.addWithUpdate(square) // 使用addWithUpdate方法添加子元素
-    canvas.requestRenderAll() // 手动更新画布
+    // layer.addWithUpdate(square) // 使用addWithUpdate方法添加子元素
+    // canvas.requestRenderAll() // 手动更新画布
   }
 
   // 添加绘制完成事件监听器
   canvas.on('path:created', function (event) {
     var drawnPath = event.path
+    drawnPath.set('selectable', false)
     // 获取当前活动图层
     // 如果有活动图层且是图层组
     if (activeLayer && activeLayer.type === 'group') {
@@ -112,7 +81,13 @@ export function moveimage() {
 export let layers = ref([])
 // 添加新图层函数
 export function addLayer() {
-  let layer = new fabric.Group([], { width: canvas.width, height: canvas.height, id: uuidv4(), selectable: false })
+  let layer = new fabric.Group([], {
+    width: canvas.width,
+    height: canvas.height,
+    id: uuidv4(),
+    titleName: uuidv4(),
+    selectable: false
+  })
   layers.value.push(layer)
   canvas.add(layer)
 }
@@ -142,18 +117,19 @@ export function setLayerOrder() {
   canvas.getObjects().forEach(function (obj, index) {
     obj.set('objectLayer', index)
   })
-  canvas.renderAll()
+  canvas.requestRenderAll()
 }
 
 // 移动图层到指定层级
-export function moveLayerToIndex(targetIndex) {
-  var activeLayer = canvas.getActiveObject()
-  if (activeLayer && activeLayer.type === 'group') {
-    var currentIndex = layers.indexOf(activeLayer)
-    if (currentIndex !== -1 && targetIndex >= 0 && targetIndex < layers.length) {
-      layers.splice(currentIndex, 1)
-      layers.splice(targetIndex, 0, activeLayer)
-      setLayerOrder()
-    }
-  }
+export function moveLayerToIndex(targetIndex, id) {
+  console.log(layers)
+
+  layers.value.forEach(function (layer) {
+    canvas.remove(layer)
+  })
+
+  layers.value.forEach(function (layer) {
+    canvas.add(layer)
+  })
+  canvas.requestRenderAll()
 }

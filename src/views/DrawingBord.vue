@@ -45,22 +45,6 @@ onMounted(() => {
 
   initCanvas(canvasDom.value, options)
 })
-
-function drawBackground(scaleFactor = 1) {
-  // console.log(scaleFactor)
-  // ctx.globalAlpha = 0.1 // 设置透明度
-  // var cellSize = 8
-  // for (var row = 0; row < canvas.height / cellSize; row++) {
-  //   for (var col = 0; col < canvas.width / cellSize; col++) {
-  //     if ((row + col) % 2 === 0) {
-  //       ctx.fillStyle = 'black'
-  //     } else {
-  //       ctx.fillStyle = 'white'
-  //     }
-  //     ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize)
-  //   }
-  // }
-}
 </script>
 <style lang="less" scoped>
 .DB-container {
@@ -92,8 +76,7 @@ function drawBackground(scaleFactor = 1) {
   }
 
   .tool {
-    flex: 2;
-    padding: 20px;
+    flex: 2.5;
     background-color: var(--vicom-bg-color);
     border-top: 1px solid var(--vicom-border-color);
     border-right: 1px solid var(--vicom-border-color);

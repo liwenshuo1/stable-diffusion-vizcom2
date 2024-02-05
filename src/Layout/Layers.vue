@@ -18,11 +18,15 @@
       @start="isDragging = true"
       @end="endDrag">
       <template #item="{ element, index }">
-        <li @click="setActiveLayer(index)" class="list-group-item" :key="element.id">
-          <div class="list-group-item" style="padding: 0">
+        <li
+          @click="setActive(index)"
+          class="list-group-item-warp"
+          :class="{ 'acitve-item': index === currentIndex }"
+          :key="element.id">
+          <div class="list-group-item">
             <SvgIcon :size="16" class="pointer" name="eye" color="#ffffff"></SvgIcon>
             <img class="canvas-img" src="../assets/6ee7d1303aa749a9848740034eec3bae201124.jpeg" alt="图层缩略图" />
-            <span>图层{{ index + 1 }}</span>
+            <span>{{ element.titleName }}</span>
           </div>
 
           <span class="ellipsis pointer">...</span>
@@ -41,6 +45,12 @@ function add() {
   addLayer()
 }
 
+const currentIndex = ref(0)
+function setActive(index) {
+  currentIndex.value = index
+  setActiveLayer(index)
+}
+
 const isDragging = ref(false)
 const dragOptions = reactive({
   animation: 0,
@@ -57,22 +67,40 @@ function endDrag(val, aaa) {
 <style lang="less" scoped>
 .layers-warp {
   .layers-title {
+    padding: 20px;
+    padding-bottom: 0;
     display: flex;
     align-items: center;
   }
 
   .edit {
+    padding: 20px;
+    padding-bottom: 0;
     display: flex;
     height: 40px;
     align-items: center;
   }
   .layers-content {
     margin-top: 20px;
-    .list-group-item {
-      padding: 5px 10px;
+    .list-group-item-warp {
+      padding: 10px 20px;
+      border: 1px solid transparent;
+      &:hover {
+        border: 1px solid var(--vicom-primary);
+      }
+
       display: flex;
       align-items: center;
       justify-content: space-between;
+    }
+
+    .acitve-item {
+      background-color: var(--vicom-primary);
+    }
+    .list-group-item {
+      display: flex;
+      align-items: center;
+
       .canvas-img {
         margin-left: 8px;
         margin-right: 8px;
@@ -84,6 +112,13 @@ function endDrag(val, aaa) {
         justify-self: end;
       }
     }
+  }
+  .ghost {
+    opacity: 0.2;
+    background: #c8ebfb;
+  }
+  .flip-list-move {
+    transition: transform 0.2s;
   }
 }
 </style>
