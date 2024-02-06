@@ -41,7 +41,7 @@ import Viewer from 'viewerjs'
 import { request } from '@/utils/request.js'
 import { nextTick, onMounted, ref } from 'vue'
 import { ElLoading } from 'element-plus'
-
+import { canvas } from '@/hooks/draw.js'
 // {
 //   "enable_hr": false,                 // 开启高清hr
 //   "denoising_strength": 0,            // 降噪强度
@@ -129,11 +129,37 @@ const url = '/api'
 const form = ref({
   prompt: '',
   batch_size: 1,
-  steps: 5
+  steps: 5,
+  alwayson_scripts: {
+    controlnet: {
+      args: [
+        {
+          enabled: true, // # 启用
+          control_mode: 0, // # 对应webui 的 Control Mode 可以直接填字符串 推荐使用下标 0 1 2
+          model: 'sd-v1-5-inpainting.ckpt [c6bbc15e32]', // # 对应webui 的 Model
+          module: 'lineart_standard (from white bg & black line)', //  # 对应webui 的 Preprocessor
+          weight: 0.45, //  # 对应webui 的Control Weight
+          resize_mode: 'Crop and Resize',
+          threshold_a: 200, //  # 阈值a 部分control module会用上
+          threshold_b: 245, //  # 阈值b
+          guidance_start: 0, //  # 什么时候介入 对应webui 的 Starting Control Step
+          guidance_end: 0.7, //  # 什么时候退出 对应webui 的 Ending Control Step
+          pixel_perfect: true, //  # 像素完美
+          processor_res: 512, //  # 预处理器分辨率
+          save_detected_map: false, //  # 因为使用了 controlnet API会返回生成controlnet的效果图，默认是True，如何不需要，改成False
+          input_image: '' //  # 图片 格式为base64
+        }
+      ]
+    }
+  }
 })
 
 const createImgList = ref()
 function create() {
+  let base64Data = canvas.toDataURL()
+  console.log(form.value.alwayson_scripts.args)
+  form.value.alwayson_scripts.controlnet.args[0].input_image = base64Data
+  console.log(base64Data)
   // createGallery()
   // gallery.show()
   // return
@@ -158,6 +184,13 @@ function create() {
       })
     })
 }
+
+function getModels() {
+  request.get('/sdapi/v1/sd-models').then((res) => {
+    console.log(res)
+  })
+}
+getModels()
 </script>
 <style lang="less">
 .sd-des-warp {

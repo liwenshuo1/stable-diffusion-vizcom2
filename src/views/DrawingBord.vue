@@ -49,6 +49,13 @@ onMounted(() => {
 
   initCanvas(canvasDom.value, options)
 })
+
+// window.addEventListener('resize', () => {
+//   const options = {}
+//   options.width = mainArea.offsetWidth
+//   options.height = mainArea.offsetHeight
+//   initCanvas(canvasDom.value, options)
+// })
 </script>
 <style lang="less" scoped>
 .DB-container {

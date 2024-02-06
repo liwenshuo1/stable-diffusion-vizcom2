@@ -21,14 +21,16 @@ export async function initCanvas(canvasDom, opt) {
 
   // 添加绘制完成事件监听器
   canvas.on('path:created', function (event) {
-    var drawnPath = event.path
-    drawnPath.set('selectable', false)
-    // 获取当前活动图层
-    // 如果有活动图层且是图层组
-    if (activeLayer && activeLayer.type === 'group') {
-      // 将绘制的路径添加到活动图层
-      activeLayer.addWithUpdate(drawnPath)
-      canvas.requestRenderAll()
+    if (canvas.isDrawingMode) {
+      let drawnPath = event.path
+      drawnPath.set('selectable', false)
+      // 获取当前活动图层
+      // 如果有活动图层且是图层组
+      if (activeLayer && activeLayer.type === 'group') {
+        // 将绘制的路径添加到活动图层
+        activeLayer.addWithUpdate(drawnPath)
+        canvas.requestRenderAll()
+      }
     }
   })
 }
@@ -120,7 +122,9 @@ export function addLayer(img) {
     height: canvas.height,
     id: uuidv4(),
     titleName: uuidv4(),
-    selectable: false
+    selectable: false,
+    lockMovementX: true, // 锁定水平移动
+    lockMovementY: true // 锁定垂直移动
   })
   layers.value.push(layer)
   canvas.add(layer)
