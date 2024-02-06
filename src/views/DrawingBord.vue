@@ -28,7 +28,7 @@ import VicomHeader from '@/Layout/VicomHeader.vue'
 import HandlePanel from '@/Layout/HandlePanel.vue'
 import { onMounted, ref } from 'vue'
 import { fabric } from 'fabric'
-import { initCanvas, addLayer } from '@/hooks/draw.js'
+import { initCanvas, addLayer, canvas } from '@/hooks/draw.js'
 const canvasDom = ref('')
 const maicRef = ref('')
 
@@ -50,12 +50,14 @@ onMounted(() => {
   initCanvas(canvasDom.value, options)
 })
 
-// window.addEventListener('resize', () => {
-//   const options = {}
-//   options.width = mainArea.offsetWidth
-//   options.height = mainArea.offsetHeight
-//   initCanvas(canvasDom.value, options)
-// })
+window.addEventListener('resize', () => {
+  const options = {}
+  options.width = mainArea.offsetWidth
+  options.height = mainArea.offsetHeight
+  canvas.setWidth(options.width)
+  canvas.setHeight(options.height)
+  canvas.requestRenderAll()
+})
 </script>
 <style lang="less" scoped>
 .DB-container {

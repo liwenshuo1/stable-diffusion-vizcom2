@@ -107,7 +107,9 @@ function drawOnActiveLayer(object) {
   }
 }
 
+let canMoveImg = false
 export function moveimage() {
+  canMoveImg = true
   const activeindex = layers.value.findIndex((item) => item.id === activeLayer.id)
   setActiveLayer(activeindex)
   canvas.isDrawingMode = false
@@ -139,8 +141,10 @@ let activeLayer
 export function setActiveLayer(index) {
   return new Promise((reslove, reject) => {
     canvas.setActiveObject(layers.value[index])
-    // layers.value[index].lockMovementX = true // 锁定水平移动
-    // layers.value[index].lockMovementY = true // 锁定垂直移动
+    if (canMoveImg) {
+      layers.value[index].lockMovementX = false // 锁定水平移动
+      layers.value[index].lockMovementY = false // 锁定垂直移动
+    }
 
     canvas.requestRenderAll()
 
@@ -177,6 +181,18 @@ export function moveLayerToIndex(targetIndex, id) {
 
 export function addLayerWithImage(base64Image) {
   fabric.Image.fromURL(base64Image, function (img) {
+    let scaleX = canvas.width / img.width
+    let scaleY = canvas.height / img.height
+    let scale = Math.min(scaleX, scaleY)
+
+    img.set({
+      scaleX: scale,
+      scaleY: scale,
+      left: (canvas.width - img.width * scale) / 2,
+      top: (canvas.height - img.height * scale) / 2,
+      selectable: false // 图片不可选中
+    })
+
     addLayer(img)
     canvas.requestRenderAll()
   })
