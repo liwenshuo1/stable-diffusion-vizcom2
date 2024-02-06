@@ -44,7 +44,7 @@
     </span>
 
     <span class="pointer">
-      <SvgIcon name="line" color="#ffffff"></SvgIcon>
+      <SvgIcon name="line" @click="creatline" color="#ffffff"></SvgIcon>
     </span>
   </div>
 </template>
@@ -52,7 +52,7 @@
 <script setup>
 import VicomTooltip from '@/components/VicomTooltip/VicomTooltip.vue'
 import { ref } from 'vue'
-import { initPencil, setColor, setwidth, initEarser, moveimage } from '@/hooks/draw.js'
+import { initPencil, initLine, setColor, setwidth, initEarser, moveimage } from '@/hooks/draw.js'
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/antd.css'
 
@@ -85,6 +85,10 @@ function earser() {
 
 function moveLayer() {
   moveimage()
+}
+
+function creatline() {
+  // initLine()
 }
 </script>
 <style lang="less" scoped>

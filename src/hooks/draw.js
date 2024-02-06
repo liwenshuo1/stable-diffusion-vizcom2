@@ -64,12 +64,44 @@ export function initEarser() {
   canvas.freeDrawingBrush.width = 10 // 设置画笔粗细为 10
 }
 
+export function initLine() {
+  canvas.isDrawingMode = false
+
+  let isDrawing = false
+  let line
+
+  canvas.on('mouse:down', function (event) {
+    isDrawing = true
+    let pointer = canvas.getPointer(event.e)
+    let points = [pointer.x, pointer.y, pointer.x, pointer.y]
+    line = new fabric.Line(points, {
+      stroke: 'black',
+      strokeWidth: 2,
+      selectable: false
+    })
+    drawOnActiveLayer(line)
+  })
+
+  canvas.on('mouse:move', function (event) {
+    if (!isDrawing) return
+    var pointer = canvas.getPointer(event.e)
+    line.set({ x2: pointer.x, y2: pointer.y })
+    canvas.requestRenderAll()
+  })
+
+  canvas.on('mouse:up', function () {
+    isDrawing = false
+  })
+
+  // drawOnActiveLayer(line)
+}
+
 // 绘制图形到当前活动图层
 function drawOnActiveLayer(object) {
-  var activeLayer = canvas.getActiveObject()
+  console.log(object)
   if (activeLayer && activeLayer.type === 'group') {
-    activeLayer.add(object)
-    canvas.requestRenderAll()
+    activeLayer.addWithUpdate(object)
+    // canvas.requestRenderAll()
   }
 }
 
@@ -103,6 +135,8 @@ let activeLayer
 export function setActiveLayer(index) {
   return new Promise((reslove, reject) => {
     canvas.setActiveObject(layers.value[index])
+    // layers.value[index].lockMovementX = true // 锁定水平移动
+    // layers.value[index].lockMovementY = true // 锁定垂直移动
 
     canvas.requestRenderAll()
 
