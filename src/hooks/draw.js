@@ -9,7 +9,7 @@ let pencliWidth = 10
 
 export async function initCanvas(canvasDom, opt) {
   canvas = new fabric.Canvas(canvasDom, {
-    backgroundColor: '#FFFFFF',
+    // backgroundColor: '#FFFFFF',
     ...opt
   })
   addLayer()
@@ -114,7 +114,7 @@ export function addLayer(img) {
 }
 
 // 删除图层
-export function deleteLayer(index) {
+export function deleteLayer(index, acitveindex) {
   if (layers.value.length <= 1) {
     ElMessage.warning('当前只有一个图层，不能删除')
     return
@@ -127,11 +127,7 @@ export function deleteLayer(index) {
   })
   canvas.requestRenderAll()
   layers.value.splice(index, 1)
-  if (index >= layers.value.length - 1) {
-    setActiveLayer(layers.value.length - 1)
-  } else {
-    setActiveLayer(index)
-  }
+  setActiveLayer(acitveindex)
 }
 
 let activeLayer

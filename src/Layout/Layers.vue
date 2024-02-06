@@ -41,7 +41,7 @@
             </div>
             <template #content>
               <div class="layer-edit-warp">
-                <div class="layer-edit-item pointer" @click="deleteLayer(index)">
+                <div class="layer-edit-item pointer" @click="deleteLayerItem(index)">
                   <SvgIcon :size="16" class="pointer" name="delete" color="#ffffff"></SvgIcon>
                   <span>删除</span>
                 </div>
@@ -126,6 +126,15 @@ function showMoreEdit(index) {
   console.log(tooltips.value)
   layers.value[index].showTooltips = true
 }
+
+function deleteLayerItem(index) {
+  if (index >= layers.value.length - 1) {
+    currentIndex.value = layers.value.length - 2
+  } else {
+    currentIndex.value = index
+  }
+  deleteLayer(index, currentIndex.value)
+}
 </script>
 <style lang="less" scoped>
 .layers-warp {
@@ -194,8 +203,10 @@ function showMoreEdit(index) {
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    border: 1px solid transparent;
+    border-radius: 6px;
     &:hover {
-      background-color: var(--vicom-primary);
+      border: 1px solid var(--vicom-primary);
     }
   }
 }
