@@ -88,7 +88,7 @@ function moveLayer() {
 }
 
 function creatline() {
-  // initLine()
+  initLine()
 }
 </script>
 <style lang="less" scoped>

@@ -32,13 +32,22 @@
           class="list-group-item-warp"
           :class="{ 'acitve-item': index === currentIndex }"
           :key="element.id">
-          <div class="list-group-item">
-            <SvgIcon :size="16" class="pointer" name="eye" color="#ffffff"></SvgIcon>
-            <img class="canvas-img" src="../assets/6ee7d1303aa749a9848740034eec3bae201124.jpeg" alt="图层缩略图" />
-            <span>{{ element.titleName }}</span>
-          </div>
-
-          <span class="ellipsis pointer">...</span>
+          <el-tooltip v-model:visible="element.showTooltips" effect="dark" placement="left" trigger="contextmenu">
+            <div class="list-group-item">
+              <SvgIcon :size="16" class="pointer" name="eye" color="#ffffff"></SvgIcon>
+              <img class="canvas-img" src="../assets/6ee7d1303aa749a9848740034eec3bae201124.jpeg" alt="图层缩略图" />
+              <span>{{ element.titleName }}</span>
+              <span class="ellipsis pointer" @click="showMoreEdit(index)">...</span>
+            </div>
+            <template #content>
+              <div class="layer-edit-warp">
+                <div class="layer-edit-item pointer" @click="deleteLayer(index)">
+                  <SvgIcon :size="16" class="pointer" name="delete" color="#ffffff"></SvgIcon>
+                  <span>删除</span>
+                </div>
+              </div>
+            </template>
+          </el-tooltip>
         </li>
       </template>
     </draggable>
@@ -47,7 +56,15 @@
 
 <script setup>
 import draggable from 'vuedraggable-es'
-import { addLayer, layers, setActiveLayer, moveLayerToIndex, addLayerWithImage, canvas } from '@/hooks/draw.js'
+import {
+  addLayer,
+  layers,
+  setActiveLayer,
+  moveLayerToIndex,
+  addLayerWithImage,
+  canvas,
+  deleteLayer
+} from '@/hooks/draw.js'
 import { ref, reactive, watch } from 'vue'
 
 const fileList = ref([])
@@ -102,6 +119,12 @@ function endDrag(val, aaa) {
   currentIndex.value = activeindex
   moveLayerToIndex(val.newIndex)
   isDragging.value = false
+}
+
+const tooltips = ref([])
+function showMoreEdit(index) {
+  console.log(tooltips.value)
+  layers.value[index].showTooltips = true
 }
 </script>
 <style lang="less" scoped>
@@ -160,6 +183,20 @@ function endDrag(val, aaa) {
   }
   .flip-list-move {
     transition: transform 0.2s;
+  }
+}
+
+.layer-edit-warp {
+  width: 100px;
+  .layer-edit-item {
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    &:hover {
+      background-color: var(--vicom-primary);
+    }
   }
 }
 </style>

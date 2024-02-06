@@ -1,3 +1,4 @@
+import { ElMessage } from 'element-plus'
 import { fabric } from 'fabric-with-erasing'
 import { v4 as uuidv4 } from 'uuid'
 import { ref } from 'vue'
@@ -13,13 +14,8 @@ export async function initCanvas(canvasDom, opt) {
   })
   addLayer()
   await setActiveLayer(0)
-  drawGridOnLayer(activeLayer)
-  function drawGridOnLayer(layer) {
-    // layer.addWithUpdate(square) // 使用addWithUpdate方法添加子元素
-    // canvas.requestRenderAll() // 手动更新画布
-  }
 
-  // 添加绘制完成事件监听器
+  // // 添加绘制完成事件监听器
   canvas.on('path:created', function (event) {
     if (canvas.isDrawingMode) {
       let drawnPath = event.path
@@ -29,7 +25,7 @@ export async function initCanvas(canvasDom, opt) {
       if (activeLayer && activeLayer.type === 'group') {
         // 将绘制的路径添加到活动图层
         activeLayer.addWithUpdate(drawnPath)
-        canvas.requestRenderAll()
+        // canvas.requestRenderAll()
       }
     }
   })
@@ -40,7 +36,6 @@ export function initPencil() {
   let pencilBrush = new fabric.PencilBrush(canvas)
   canvas.freeDrawingBrush = pencilBrush
   setColor(color)
-  // pencil.width = 30
 }
 
 export function setColor(val) {
@@ -68,34 +63,16 @@ export function initEarser() {
 
 export function initLine() {
   canvas.isDrawingMode = false
-
-  let isDrawing = false
-  let line
-
-  canvas.on('mouse:down', function (event) {
-    isDrawing = true
-    let pointer = canvas.getPointer(event.e)
-    let points = [pointer.x, pointer.y, pointer.x, pointer.y]
-    line = new fabric.Line(points, {
-      stroke: 'black',
-      strokeWidth: 2,
-      selectable: false
-    })
-    drawOnActiveLayer(line)
+  // 创建一个简单的方块
+  var rect = new fabric.Rect({
+    left: 100, // 左上角 x 坐标
+    top: 100, // 左上角 y 坐标
+    width: 100, // 方块宽度
+    height: 100, // 方块高度
+    fill: 'blue' // 填充颜色
   })
 
-  canvas.on('mouse:move', function (event) {
-    if (!isDrawing) return
-    var pointer = canvas.getPointer(event.e)
-    line.set({ x2: pointer.x, y2: pointer.y })
-    canvas.requestRenderAll()
-  })
-
-  canvas.on('mouse:up', function () {
-    isDrawing = false
-  })
-
-  // drawOnActiveLayer(line)
+  drawOnActiveLayer(rect)
 }
 
 // 绘制图形到当前活动图层
@@ -103,7 +80,7 @@ function drawOnActiveLayer(object) {
   console.log(object)
   if (activeLayer && activeLayer.type === 'group') {
     activeLayer.addWithUpdate(object)
-    // canvas.requestRenderAll()
+    canvas.requestRenderAll()
   }
 }
 
@@ -133,6 +110,27 @@ export function addLayer(img) {
   if (img) {
     layer.addWithUpdate(img)
     canvas.requestRenderAll()
+  }
+}
+
+// 删除图层
+export function deleteLayer(index) {
+  if (layers.value.length <= 1) {
+    ElMessage.warning('当前只有一个图层，不能删除')
+    return
+  }
+  canvas.clear()
+  layers.value.forEach(function (layer, j) {
+    if (j != index) {
+      canvas.add(layer)
+    }
+  })
+  canvas.requestRenderAll()
+  layers.value.splice(index, 1)
+  if (index >= layers.value.length - 1) {
+    setActiveLayer(layers.value.length - 1)
+  } else {
+    setActiveLayer(index)
   }
 }
 
