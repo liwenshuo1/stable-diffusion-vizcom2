@@ -36,7 +36,36 @@
     </span>
 
     <span class="pointer">
-      <SvgIcon name="eraser" @click="earser" color="#ffffff"></SvgIcon>
+      <el-popover
+        v-model="pencilEdit"
+        :teleported="false"
+        transition="none"
+        :hide-after="0"
+        placement="right"
+        :offset="16"
+        :width="200"
+        trigger="click">
+        <template #reference>
+          <!-- <el-tooltip
+            :hide-after="0"
+            ref="pencilTooltip"
+            class="box-item"
+            :offset="16"
+            effect="dark"
+            content="铅笔(B)"
+            placement="right"> -->
+          <SvgIcon name="eraser" @click="earser" color="#ffffff"></SvgIcon>
+          <!-- </el-tooltip> -->
+        </template>
+        <template #default>
+          <div class="pencil-card">
+            <span>橡皮设置</span>
+
+            <!-- https://nightcatsama.github.io/vue-slider-component/#/api/slots -->
+            <VueSlider @change="changeEraserSize" :dotSize="18" tooltip="none" v-model="eraserlWidth"></VueSlider>
+          </div>
+        </template>
+      </el-popover>
     </span>
 
     <span class="pointer">
@@ -52,7 +81,7 @@
 <script setup>
 import VicomTooltip from '@/components/VicomTooltip/VicomTooltip.vue'
 import { ref } from 'vue'
-import { initPencil, initLine, setColor, setwidth, initEarser, moveimage } from '@/hooks/draw.js'
+import { initPencil, initLine, setColor, setwidth, initEarser, moveimage, setEraserWidth } from '@/hooks/draw.js'
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/antd.css'
 
@@ -68,11 +97,17 @@ function showColorPicker() {
 
 const pencilEdit = ref(false)
 const pencilTooltip = ref('')
-const pencilWidth = ref(10)
 
+const pencilWidth = ref(10)
 function changePencilSize(val) {
   setwidth(val)
 }
+
+const eraserlWidth = ref(10)
+function changeEraserSize(val) {
+  setEraserWidth(val)
+}
+
 function pencil() {
   // pencilTooltip.value.onClose()
   pencilEdit.value = true

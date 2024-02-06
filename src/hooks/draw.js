@@ -6,6 +6,7 @@ export let canvas
 
 let color = '#000000'
 let pencliWidth = 10
+let eraserWidth = 10
 
 export async function initCanvas(canvasDom, opt) {
   canvas = new fabric.Canvas(canvasDom, {
@@ -58,7 +59,12 @@ export function setwidth(val) {
 export function initEarser() {
   canvas.isDrawingMode = true // 进入绘画模式
   canvas.freeDrawingBrush = new fabric.EraserBrush(canvas) // 使用橡皮擦画笔
-  canvas.freeDrawingBrush.width = 10 // 设置画笔粗细为 10
+  canvas.freeDrawingBrush.width = eraserWidth // 设置画笔粗细为 10
+}
+
+export function setEraserWidth(val) {
+  eraserWidth = val
+  canvas.freeDrawingBrush.width = eraserWidth
 }
 
 export function initLine() {
