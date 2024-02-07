@@ -15,6 +15,20 @@
         <el-radio :label="2">2</el-radio>
         <el-radio :label="4">4</el-radio>
       </el-radio-group>
+
+      <el-divider />
+      <div style="margin-bottom: 10px">图片生成尺寸</div>
+      <div class="size-warp">
+        <el-form label-width="50px">
+          <el-form-item label="长度">
+            <el-input v-model.number="form.width" placeholder="请出入图片宽" />
+          </el-form-item>
+          <el-form-item label="宽度">
+            <el-input v-model.number="form.height" placeholder="请出入图片长" />
+          </el-form-item>
+        </el-form>
+      </div>
+
       <el-divider />
       <div style="margin-bottom: 10px">图片生成步数</div>
       <el-radio-group v-model="form.steps">
@@ -130,6 +144,8 @@ const form = ref({
   prompt: '',
   batch_size: 1,
   steps: 5,
+  width: 512,
+  height: 512,
   alwayson_scripts: {
     controlnet: {
       args: [
@@ -210,5 +226,9 @@ getModels()
   background-image: url('../assets/download.png');
   background-size: 20px 20px;
   background-position: center;
+}
+
+.size-warp {
+  display: flex;
 }
 </style>
