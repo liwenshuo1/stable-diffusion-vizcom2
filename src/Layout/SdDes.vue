@@ -195,6 +195,9 @@ function create() {
       console.log('res, rees', res)
       loading.close()
       nextTick(() => {
+        if (gallery) {
+          gallery.destroy()
+        }
         createGallery()
         gallery.show()
       })
