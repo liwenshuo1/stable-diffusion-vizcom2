@@ -34,7 +34,20 @@
           :key="element.id">
           <el-tooltip v-model:visible="element.showTooltips" effect="dark" placement="left" trigger="contextmenu">
             <div class="list-group-item">
-              <SvgIcon :size="16" class="pointer" name="eye" color="#ffffff"></SvgIcon>
+              <SvgIcon
+                v-if="element.visible"
+                :size="16"
+                class="pointer"
+                name="eye"
+                color="#ffffff"
+                @click="hiddenLayerItem(index)"></SvgIcon>
+              <SvgIcon
+                v-else
+                :size="16"
+                class="pointer"
+                name="eye-close"
+                color="#ffffff"
+                @click="hiddenLayerItem(index)"></SvgIcon>
               <img class="canvas-img" src="../assets/6ee7d1303aa749a9848740034eec3bae201124.jpeg" alt="图层缩略图" />
               <span>{{ element.titleName }}</span>
               <span class="ellipsis pointer" @click="showMoreEdit(index)">...</span>
@@ -63,7 +76,8 @@ import {
   moveLayerToIndex,
   addLayerWithImage,
   canvas,
-  deleteLayer
+  deleteLayer,
+  hiddenLayer
 } from '@/hooks/draw.js'
 import { ref, reactive, watch } from 'vue'
 
@@ -134,6 +148,10 @@ function deleteLayerItem(index) {
     currentIndex.value = index
   }
   deleteLayer(index, currentIndex.value)
+}
+
+function hiddenLayerItem(index) {
+  hiddenLayer(index)
 }
 </script>
 <style lang="less" scoped>

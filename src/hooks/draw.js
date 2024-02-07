@@ -103,6 +103,7 @@ export let layers = ref([])
 // 添加新图层函数
 export function addLayer(img) {
   let layer = new fabric.Group([], {
+    visible: true,
     width: canvas.width,
     height: canvas.height,
     id: uuidv4(),
@@ -134,6 +135,18 @@ export function deleteLayer(index, acitveindex) {
   canvas.requestRenderAll()
   layers.value.splice(index, 1)
   setActiveLayer(acitveindex)
+}
+
+// 隐藏图层
+export function hiddenLayer(index, acitveindex) {
+  canvas.clear()
+  layers.value.forEach(function (layer, j) {
+    if (j == index) {
+      layers.value[index].visible = !layers.value[index].visible
+    }
+    canvas.add(layer)
+  })
+  canvas.requestRenderAll()
 }
 
 let activeLayer
