@@ -29,7 +29,7 @@
             <span>铅笔设置</span>
 
             <!-- https://nightcatsama.github.io/vue-slider-component/#/api/slots -->
-            <VueSlider @change="changePencilSize" :dotSize="18" tooltip="none" v-model="pencilWidth"></VueSlider>
+            <VueSlider @change="changePencilSize" v-bind="slider" v-model="pencilWidth"></VueSlider>
           </div>
         </template>
       </el-popover>
@@ -62,7 +62,7 @@
             <span>橡皮设置</span>
 
             <!-- https://nightcatsama.github.io/vue-slider-component/#/api/slots -->
-            <VueSlider @change="changeEraserSize" :dotSize="18" tooltip="none" v-model="eraserlWidth"></VueSlider>
+            <VueSlider @change="changeEraserSize" v-bind="slider" v-model="eraserlWidth"></VueSlider>
           </div>
         </template>
       </el-popover>
@@ -124,6 +124,18 @@ function moveLayer() {
 
 function creatline() {
   initLine()
+}
+
+const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--vicom-primary')
+const slider = {
+  dotSize: 18,
+  tooltip: 'none',
+  processStyle: {
+    backgroundColor: themeColor
+  },
+  dotStyle: {
+    borderColor: themeColor
+  }
 }
 </script>
 <style lang="less" scoped>
