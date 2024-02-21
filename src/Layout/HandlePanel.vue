@@ -73,7 +73,39 @@
     </span>
 
     <span class="pointer">
-      <SvgIcon name="line" @click="creatline" color="#ffffff"></SvgIcon>
+      <el-popover
+        v-model="pencilEdit"
+        :teleported="false"
+        transition="none"
+        :hide-after="0"
+        placement="right"
+        :offset="16"
+        :width="200"
+        trigger="click">
+        <template #reference>
+          <!-- <el-tooltip
+            :hide-after="0"
+            ref="pencilTooltip"
+            class="box-item"
+            :offset="16"
+            effect="dark"
+            content="铅笔(B)"
+            placement="right"> -->
+          <SvgIcon :name="graphName" @click="readyGraph(graphName)" color="#ffffff"></SvgIcon>
+          <!-- </el-tooltip> -->
+        </template>
+        <template #default>
+          <div class="pencil-card">
+            <div class="graph-warp">
+              <SvgIcon name="line" @click="setGraph('line')" color="#ffffff"></SvgIcon>
+              <!-- <SvgIcon name="rect" @click="setGraph('rect')" color="#ffffff"></SvgIcon> -->
+              <SvgIcon name="circle" @click="setGraph('circle')" color="#ffffff"></SvgIcon>
+              <VueSlider @change="changeGraphWidth" v-bind="slider" v-model="eraserlWidth"></VueSlider>
+            </div>
+            <!-- https://nightcatsama.github.io/vue-slider-component/#/api/slots -->
+          </div>
+        </template>
+      </el-popover>
     </span>
   </div>
 </template>
@@ -81,7 +113,17 @@
 <script setup>
 import VicomTooltip from '@/components/VicomTooltip/VicomTooltip.vue'
 import { ref } from 'vue'
-import { initPencil, initLine, setColor, setwidth, initEarser, moveimage, setEraserWidth } from '@/hooks/draw.js'
+import {
+  initPencil,
+  initLine,
+  setColor,
+  setwidth,
+  initEarser,
+  moveimage,
+  setEraserWidth,
+  changeGraphWidth,
+  initCircle
+} from '@/hooks/draw.js'
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/antd.css'
 
@@ -126,6 +168,11 @@ function creatline() {
   initLine()
 }
 
+function readyGraph(value) {
+  if (value == 'line') {
+    initLine()
+  }
+}
 const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--vicom-primary')
 const slider = {
   dotSize: 18,
@@ -135,6 +182,20 @@ const slider = {
   },
   dotStyle: {
     borderColor: themeColor
+  }
+}
+
+const graphName = ref('line')
+function setGraph(value) {
+  graphName.value = value
+
+  if (value == 'line') {
+    initLine()
+    return
+  }
+
+  if (value == 'circle') {
+    initCircle()
   }
 }
 </script>
@@ -155,6 +216,10 @@ const slider = {
     .color-picker-el {
       display: none;
     }
+  }
+  .graph-warp {
+    display: grid;
+    gap: 10px;
   }
 }
 

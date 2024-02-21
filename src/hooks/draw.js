@@ -7,6 +7,7 @@ export let canvas
 let color = '#000000'
 let pencliWidth = 10
 let eraserWidth = 10
+let graphWidth = 10
 let currentTool = 'pencil'
 
 export async function initCanvas(canvasDom, opt) {
@@ -72,20 +73,31 @@ export function setEraserWidth(val) {
   canvas.freeDrawingBrush.width = eraserWidth
 }
 
+// 设置图形宽度
+
+export function changeGraphWidth(val) {
+  graphWidth = val
+}
+// 直线
+
 export function initLine() {
+  if (currentTool === 'line') return
+
   currentTool = 'line'
   canvas.isDrawingMode = false
-  let isDrawing, line
+  let line
+  let isDrawing
   // 鼠标按下事件处理函数
   function onMouseDown(event) {
     if (currentTool !== 'line') return
 
     isDrawing = true
-    var pointer = canvas.getPointer(event.e)
-    var points = [pointer.x, pointer.y, pointer.x, pointer.y]
+    let pointer = canvas.getPointer(event.e)
+    let points = [pointer.x, pointer.y, pointer.x, pointer.y]
     line = new fabric.Line(points, {
-      strokeWidth: 2,
+      strokeWidth: graphWidth,
       stroke: color,
+      strokeLineCap: 'round', // 设置直线端点样式为圆形
       selectable: false
     })
     canvas.add(line)
@@ -95,7 +107,7 @@ export function initLine() {
   function onMouseMove(event) {
     if (currentTool !== 'line') return
     if (!isDrawing) return
-    var pointer = canvas.getPointer(event.e)
+    let pointer = canvas.getPointer(event.e)
     line.set({ x2: pointer.x, y2: pointer.y })
     // canvas.renderAll()
     canvas.requestRenderAll()
@@ -117,6 +129,63 @@ export function initLine() {
   canvas.on('mouse:up', onMouseUp)
   //
 }
+
+// 圆圈
+
+export function initCircle() {
+  if (currentTool === 'circle') return
+
+  currentTool = 'circle'
+  canvas.isDrawingMode = false
+  let isDrawing = false
+  let circle
+
+  // 鼠标按下事件处理函数
+  canvas.on('mouse:down', function (event) {
+    if (currentTool !== 'circle') return
+    if (!isDrawing) {
+      isDrawing = true
+      let pointer = canvas.getPointer(event.e)
+      let startX = pointer.x
+      let startY = pointer.y
+      circle = new fabric.Circle({
+        selectable: false,
+        left: startX,
+        top: startY,
+        radius: 0,
+        strokeWidth: graphWidth, // 设置线条宽度
+        stroke: color, // 设置线条颜色
+        fill: 'transparent' // 设置填充颜色为透明，实现空心效果
+      })
+      canvas.add(circle)
+    }
+  })
+
+  // 鼠标移动事件处理函数
+  canvas.on('mouse:move', function (event) {
+    if (currentTool !== 'circle') return
+    if (isDrawing) {
+      let pointer = canvas.getPointer(event.e)
+      let endX = pointer.x
+      let endY = pointer.y
+      let radius = Math.sqrt(Math.pow(endX - circle.left, 2) + Math.pow(endY - circle.top, 2))
+      circle.set({
+        radius: radius
+      })
+      canvas.requestRenderAll()
+    }
+  })
+
+  // 鼠标释放事件处理函数
+  canvas.on('mouse:up', function (event) {
+    if (currentTool !== 'circle') return
+    isDrawing = false
+    activeLayer.addWithUpdate(circle)
+    canvas.discardActiveObject()
+  })
+}
+
+// 方形
 
 // 绘制图形到当前活动图层
 function drawOnActiveLayer(object) {
