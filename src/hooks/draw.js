@@ -7,10 +7,12 @@ export let canvas
 let color = '#000000'
 let pencliWidth = 10
 let eraserWidth = 10
+let currentTool = 'pencil'
 
 export async function initCanvas(canvasDom, opt) {
   canvas = new fabric.Canvas(canvasDom, {
     // backgroundColor: '#FFFFFF',
+    selection: false,
     ...opt
   })
   addLayer()
@@ -33,6 +35,7 @@ export async function initCanvas(canvasDom, opt) {
 }
 
 export function initPencil() {
+  currentTool = 'pencil'
   canvas.isDrawingMode = true
   let pencilBrush = new fabric.PencilBrush(canvas)
   canvas.freeDrawingBrush = pencilBrush
@@ -57,6 +60,8 @@ export function setwidth(val) {
 }
 
 export function initEarser() {
+  currentTool = 'earser'
+
   canvas.isDrawingMode = true // 进入绘画模式
   canvas.freeDrawingBrush = new fabric.EraserBrush(canvas) // 使用橡皮擦画笔
   canvas.freeDrawingBrush.width = eraserWidth // 设置画笔粗细为 10
@@ -68,17 +73,49 @@ export function setEraserWidth(val) {
 }
 
 export function initLine() {
+  currentTool = 'line'
   canvas.isDrawingMode = false
-  // 创建一个简单的方块
-  var rect = new fabric.Rect({
-    left: 100, // 左上角 x 坐标
-    top: 100, // 左上角 y 坐标
-    width: 100, // 方块宽度
-    height: 100, // 方块高度
-    fill: 'blue' // 填充颜色
-  })
+  let isDrawing, line
+  // 鼠标按下事件处理函数
+  function onMouseDown(event) {
+    if (currentTool !== 'line') return
 
-  drawOnActiveLayer(rect)
+    isDrawing = true
+    var pointer = canvas.getPointer(event.e)
+    var points = [pointer.x, pointer.y, pointer.x, pointer.y]
+    line = new fabric.Line(points, {
+      strokeWidth: 2,
+      stroke: color,
+      selectable: false
+    })
+    canvas.add(line)
+  }
+
+  // 鼠标移动事件处理函数
+  function onMouseMove(event) {
+    if (currentTool !== 'line') return
+    if (!isDrawing) return
+    var pointer = canvas.getPointer(event.e)
+    line.set({ x2: pointer.x, y2: pointer.y })
+    // canvas.renderAll()
+    canvas.requestRenderAll()
+  }
+
+  // 鼠标释放事件处理函数
+  function onMouseUp(event) {
+    if (currentTool !== 'line') return
+    isDrawing = false
+
+    line.set('selectable', false)
+
+    activeLayer.addWithUpdate(line)
+    canvas.discardActiveObject()
+  }
+  // 绑定鼠标事件监听器
+  canvas.on('mouse:down', onMouseDown)
+  canvas.on('mouse:move', onMouseMove)
+  canvas.on('mouse:up', onMouseUp)
+  //
 }
 
 // 绘制图形到当前活动图层
@@ -92,6 +129,7 @@ function drawOnActiveLayer(object) {
 
 let canMoveImg = false
 export function moveimage() {
+  currentTool = 'move'
   canMoveImg = true
   const activeindex = layers.value.findIndex((item) => item.id === activeLayer.id)
   setActiveLayer(activeindex)
