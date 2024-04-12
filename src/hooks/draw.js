@@ -1,14 +1,39 @@
 import { ElMessage } from 'element-plus'
 import { fabric } from 'fabric-with-erasing'
 import { v4 as uuidv4 } from 'uuid'
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 export let canvas
 
 let color = '#000000'
 let pencliWidth = 10
 let eraserWidth = 10
 let graphWidth = 10
-let currentTool = 'pencil'
+export let currentTool = reactive(
+  new Map([
+    ['pencil', true],
+    ['move', false],
+    ['eraser', false],
+    ['line', false],
+    ['circle', false]
+  ])
+)
+
+let canMoveImg = false
+function setCurrentTool(currentKey) {
+  currentTool.forEach((value, key, map) => {
+    currentTool.set(key, false)
+  })
+  currentTool.set(currentKey, true)
+
+  const activeindex = layers.value.findIndex((item) => item.id === activeLayer.id)
+  if (currentTool.get('move')) {
+    layers.value[activeindex].lockMovementX = false // 锁定水平移动
+    layers.value[activeindex].lockMovementY = false // 锁定垂直移动
+  } else {
+    layers.value[activeindex].lockMovementX = true // 锁定水平移动
+    layers.value[activeindex].lockMovementY = true // 锁定垂直移动
+  }
+}
 
 export async function initCanvas(canvasDom, opt) {
   canvas = new fabric.Canvas(canvasDom, {
@@ -18,7 +43,7 @@ export async function initCanvas(canvasDom, opt) {
   })
   addLayer()
   await setActiveLayer(0)
-
+  initPencil()
   // // 添加绘制完成事件监听器
   canvas.on('path:created', function (event) {
     if (canvas.isDrawingMode) {
@@ -33,14 +58,6 @@ export async function initCanvas(canvasDom, opt) {
       }
     }
   })
-}
-
-export function initPencil() {
-  currentTool = 'pencil'
-  canvas.isDrawingMode = true
-  let pencilBrush = new fabric.PencilBrush(canvas)
-  canvas.freeDrawingBrush = pencilBrush
-  setColor(color)
 }
 
 export function setColor(val) {
@@ -59,10 +76,18 @@ export function setwidth(val) {
     canvas.freeDrawingBrush.width = pencliWidth
   }
 }
+export function initPencil() {
+  // if (currentTool.get('pencil')) return
+  setCurrentTool('pencil')
+  canvas.isDrawingMode = true
+  let pencilBrush = new fabric.PencilBrush(canvas)
+  canvas.freeDrawingBrush = pencilBrush
+  setColor(color)
+}
 
 export function initEarser() {
-  currentTool = 'earser'
-
+  // if (currentTool.get('pencil')) return
+  setCurrentTool('earser')
   canvas.isDrawingMode = true // 进入绘画模式
   canvas.freeDrawingBrush = new fabric.EraserBrush(canvas) // 使用橡皮擦画笔
   canvas.freeDrawingBrush.width = eraserWidth // 设置画笔粗细为 10
@@ -81,16 +106,14 @@ export function changeGraphWidth(val) {
 // 直线
 
 export function initLine() {
-  if (currentTool === 'line') return
-
-  currentTool = 'line'
+  if (currentTool.get('line')) return
+  setCurrentTool('line')
   canvas.isDrawingMode = false
   let line
   let isDrawing
   // 鼠标按下事件处理函数
   function onMouseDown(event) {
-    if (currentTool !== 'line') return
-
+    if (!currentTool.get('line')) return
     isDrawing = true
     let pointer = canvas.getPointer(event.e)
     let points = [pointer.x, pointer.y, pointer.x, pointer.y]
@@ -105,7 +128,7 @@ export function initLine() {
 
   // 鼠标移动事件处理函数
   function onMouseMove(event) {
-    if (currentTool !== 'line') return
+    if (!currentTool.get('line')) return
     if (!isDrawing) return
     let pointer = canvas.getPointer(event.e)
     line.set({ x2: pointer.x, y2: pointer.y })
@@ -115,11 +138,9 @@ export function initLine() {
 
   // 鼠标释放事件处理函数
   function onMouseUp(event) {
-    if (currentTool !== 'line') return
+    if (!currentTool.get('line')) return
     isDrawing = false
-
     line.set('selectable', false)
-
     activeLayer.addWithUpdate(line)
     canvas.discardActiveObject()
   }
@@ -133,16 +154,16 @@ export function initLine() {
 // 圆圈
 
 export function initCircle() {
-  if (currentTool === 'circle') return
+  if (currentTool.get('circle')) return
 
-  currentTool = 'circle'
+  setCurrentTool('circle')
   canvas.isDrawingMode = false
   let isDrawing = false
   let circle
 
   // 鼠标按下事件处理函数
   canvas.on('mouse:down', function (event) {
-    if (currentTool !== 'circle') return
+    if (!currentTool.get('circle')) return
     if (!isDrawing) {
       isDrawing = true
       let pointer = canvas.getPointer(event.e)
@@ -163,7 +184,7 @@ export function initCircle() {
 
   // 鼠标移动事件处理函数
   canvas.on('mouse:move', function (event) {
-    if (currentTool !== 'circle') return
+    if (!currentTool.get('circle')) return
     if (isDrawing) {
       let pointer = canvas.getPointer(event.e)
       let endX = pointer.x
@@ -178,7 +199,7 @@ export function initCircle() {
 
   // 鼠标释放事件处理函数
   canvas.on('mouse:up', function (event) {
-    if (currentTool !== 'circle') return
+    if (!currentTool.get('circle')) return
     isDrawing = false
     activeLayer.addWithUpdate(circle)
     canvas.discardActiveObject()
@@ -196,10 +217,8 @@ function drawOnActiveLayer(object) {
   }
 }
 
-let canMoveImg = false
 export function moveimage() {
-  currentTool = 'move'
-  canMoveImg = true
+  setCurrentTool('move')
   const activeindex = layers.value.findIndex((item) => item.id === activeLayer.id)
   setActiveLayer(activeindex)
   canvas.isDrawingMode = false
@@ -261,10 +280,6 @@ let activeLayer
 export function setActiveLayer(index) {
   return new Promise((reslove, reject) => {
     canvas.setActiveObject(layers.value[index])
-    if (canMoveImg) {
-      layers.value[index].lockMovementX = false // 锁定水平移动
-      layers.value[index].lockMovementY = false // 锁定垂直移动
-    }
 
     canvas.requestRenderAll()
 

@@ -21,7 +21,10 @@
             effect="dark"
             content="铅笔(B)"
             placement="right"> -->
-          <SvgIcon name="cc-pencil" @click="pencil" color="#ffffff"></SvgIcon>
+          <SvgIcon
+            name="cc-pencil"
+            @click="pencil"
+            :color="currentTool.get('pencil') ? themeColor : '#ffffff'"></SvgIcon>
           <!-- </el-tooltip> -->
         </template>
         <template #default>
@@ -54,7 +57,7 @@
             effect="dark"
             content="铅笔(B)"
             placement="right"> -->
-          <SvgIcon name="eraser" @click="earser" color="#ffffff"></SvgIcon>
+          <SvgIcon name="eraser" @click="earser" :color="currentTool.get('earser') ? themeColor : '#ffffff'"></SvgIcon>
           <!-- </el-tooltip> -->
         </template>
         <template #default>
@@ -69,7 +72,7 @@
     </span>
 
     <span class="pointer">
-      <SvgIcon name="move" @click="moveLayer" color="#ffffff"></SvgIcon>
+      <SvgIcon name="move" @click="moveLayer" :color="currentTool.get('move') ? themeColor : '#ffffff'"></SvgIcon>
     </span>
 
     <span class="pointer">
@@ -91,7 +94,10 @@
             effect="dark"
             content="铅笔(B)"
             placement="right"> -->
-          <SvgIcon :name="graphName" @click="readyGraph(graphName)" color="#ffffff"></SvgIcon>
+          <SvgIcon
+            :name="graphName"
+            @click="readyGraph(graphName)"
+            :color="currentTool.get('line') || currentTool.get('circle') ? themeColor : '#ffffff'"></SvgIcon>
           <!-- </el-tooltip> -->
         </template>
         <template #default>
@@ -114,6 +120,7 @@
 import VicomTooltip from '@/components/VicomTooltip/VicomTooltip.vue'
 import { ref } from 'vue'
 import {
+  currentTool,
   initPencil,
   initLine,
   setColor,
@@ -171,6 +178,11 @@ function creatline() {
 function readyGraph(value) {
   if (value == 'line') {
     initLine()
+    return
+  }
+
+  if (value == 'circle') {
+    initCircle()
   }
 }
 const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--vicom-primary')
@@ -188,15 +200,7 @@ const slider = {
 const graphName = ref('line')
 function setGraph(value) {
   graphName.value = value
-
-  if (value == 'line') {
-    initLine()
-    return
-  }
-
-  if (value == 'circle') {
-    initCircle()
-  }
+  readyGraph(value)
 }
 </script>
 <style lang="less" scoped>
