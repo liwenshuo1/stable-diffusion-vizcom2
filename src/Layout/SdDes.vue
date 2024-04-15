@@ -153,7 +153,7 @@ const form = ref({
           enabled: true, // # 启用
           control_mode: 0, // # 对应webui 的 Control Mode 可以直接填字符串 推荐使用下标 0 1 2
           model: 'sd-v1-5-inpainting.ckpt [c6bbc15e32]', // # 对应webui 的 Model
-          module: 'lineart_standard (from white bg & black line)', //  # 对应webui 的 Preprocessor
+          module: 'depth', //  # 对应webui 的 Preprocessor
           weight: 0.45, //  # 对应webui 的Control Weight
           resize_mode: 'Crop and Resize',
           threshold_a: 200, //  # 阈值a 部分control module会用上
@@ -206,9 +206,38 @@ function create() {
 
 function getModels() {
   request.get('/sdapi/v1/sd-models').then((res) => {
-    console.log(res)
+    console.log('模型列表', res)
   })
 }
+
+function getLoras() {
+  request.get('/sdapi/v1/loras').then((res) => {
+    console.log('loras列表', res)
+  })
+}
+
+function getControlnetVersion() {
+  request.get('/controlnet/version').then((res) => {
+    console.log('getControlnetVersion', res)
+  })
+}
+
+function getControlnetModel_list() {
+  request.get('/controlnet/model_list').then((res) => {
+    console.log('getControlnetModel_list', res)
+  })
+}
+
+function getControlnetModule_list() {
+  request.get('/controlnet/module_list').then((res) => {
+    console.log('module_list', res)
+  })
+}
+
+getControlnetModel_list()
+getControlnetModule_list()
+getControlnetVersion()
+getLoras()
 getModels()
 </script>
 <style lang="less">
