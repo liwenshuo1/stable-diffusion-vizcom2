@@ -9,8 +9,8 @@
       </main>
 
       <div class="tool">
-        <SdDes v-if="activeName === 'sdDes'"></SdDes>
-        <Layers v-if="activeName === 'layers'" />
+        <SdDes v-show="activeName === 'sdDes'"></SdDes>
+        <Layers v-show="activeName === 'layers'" />
       </div>
 
       <aside class="aside">
