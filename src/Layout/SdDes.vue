@@ -9,12 +9,14 @@
       <div style="margin-bottom: 10px">Prompt</div>
       <el-input v-model="form.prompt" :rows="8" type="textarea" placeholder="你想要创造什么" />
       <el-divider />
-      <div style="margin-bottom: 10px">图片张数</div>
-      <el-radio-group v-model="form.batch_size">
+      <div style="margin-bottom: 40px">图片张数</div>
+      <VueSlider :min="1" :max="20" v-bind="slider" v-model="form.batch_size"></VueSlider>
+
+      <!-- <el-radio-group v-model="form.batch_size">
         <el-radio :label="1">1</el-radio>
         <el-radio :label="2">2</el-radio>
         <el-radio :label="4">4</el-radio>
-      </el-radio-group>
+      </el-radio-group> -->
 
       <el-divider />
       <div style="margin-bottom: 10px">图片生成尺寸</div>
@@ -30,12 +32,15 @@
       </div>
 
       <el-divider />
-      <div style="margin-bottom: 10px">图片生成步数</div>
-      <el-radio-group v-model="form.steps">
+      <div style="margin-bottom: 40px">图片生成步数</div>
+
+      <VueSlider :min="5" :max="50" v-bind="slider" v-model="form.steps"></VueSlider>
+
+      <!-- <el-radio-group v-model="form.steps">
         <el-radio :label="5">5</el-radio>
         <el-radio :label="25">25</el-radio>
         <el-radio :label="50">50</el-radio>
-      </el-radio-group>
+      </el-radio-group> -->
       <el-divider />
 
       <el-button style="width: 100%" tag="div" type="primary" @click="create">确定</el-button>
@@ -56,6 +61,8 @@ import { request } from '@/utils/request.js'
 import { nextTick, onMounted, ref } from 'vue'
 import { ElLoading } from 'element-plus'
 import { canvas } from '@/hooks/draw.js'
+import VueSlider from 'vue-slider-component'
+
 // {
 //   "enable_hr": false,                 // 开启高清hr
 //   "denoising_strength": 0,            // 降噪强度
@@ -234,6 +241,26 @@ function getControlnetModule_list() {
   })
 }
 
+function getControlnetSettings() {
+  request.get('/controlnet/settings').then((res) => {
+    console.log('getControlnetSettings', res)
+  })
+}
+const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--vicom-primary')
+const slider = {
+  dotSize: 15,
+  dotOptions: {
+    tooltip: 'always'
+  },
+  processStyle: {
+    backgroundColor: themeColor
+  },
+  dotStyle: {
+    borderColor: themeColor
+  }
+}
+function changeGraphWidth() {}
+getControlnetSettings()
 getControlnetModel_list()
 getControlnetModule_list()
 getControlnetVersion()
