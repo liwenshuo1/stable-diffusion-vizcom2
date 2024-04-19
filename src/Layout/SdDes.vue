@@ -12,7 +12,7 @@
 
       <div style="margin-bottom: 10px">风格</div>
       <el-select v-model="LorasText" placeholder="请选择">
-        <el-option v-for="item in LorasList" :key="item.value" :label="item.label" :value="item.value" />
+        <el-option v-for="item in LorasList" :key="item.name" :label="item.name" :value="item.name" />
       </el-select>
       <el-divider />
 
@@ -50,9 +50,9 @@
       </el-radio-group> -->
       <el-divider />
 
-      <div style="margin-bottom: 40px">提示词引导系数</div>
+      <!-- <div style="margin-bottom: 40px">提示词引导系数</div>
       <VueSlider :min="5" :max="50" v-bind="slider" v-model="form.steps"></VueSlider>
-      <el-divider />
+      <el-divider /> -->
 
       <el-button style="width: 100%" tag="div" type="primary" @click="create">确定</el-button>
     </div>
@@ -71,9 +71,11 @@ import Viewer from 'viewerjs'
 import { request } from '@/utils/request.js'
 import { nextTick, onMounted, ref } from 'vue'
 import { ElLoading } from 'element-plus'
-import { canvas } from '@/hooks/draw.js'
+import { canvas, layers, initCanvas, addLayerWithImage } from '@/hooks/draw.js'
 import VueSlider from 'vue-slider-component'
-
+import { loraList } from '@/test/loarlist.js'
+import reSetImg from '@/assets/reSetImg.svg'
+console.log(reSetImg)
 // {
 //   "enable_hr": false,                 // 开启高清hr
 //   "denoising_strength": 0,            // 降噪强度
@@ -169,25 +171,67 @@ const form = ref({
       args: [
         {
           enabled: true, // # 启用
-          control_mode: 0, // # 对应webui 的 Control Mode 可以直接填字符串 推荐使用下标 0 1 2
-          model: 'sd-v1-5-inpainting.ckpt [c6bbc15e32]', // # 对应webui 的 Model
-          module: 'depth', //  # 对应webui 的 Preprocessor
-          input_image: '' //  # 图片 格式为base64
+          control_mode: 'Balanced', // # 对应webui 的 Control Mode 可以直接填字符串 推荐使用下标 0 1 2
+          model: 'control_v11p_sd15_lineart [43d4be0d]', // # 对应webui 的 Model
+          module: 'lineart_standard (from white bg & black line)', //  # 对应webui 的 Preprocessor
+          input_image: {
+            image: '',
+            mask: ''
+          } //  # 图片 格式为base64
         }
       ]
     }
-  }
+  },
+  // 下面是默认参数
+  // cfg_scale: 7,
+  // comments: {},
+  // denoising_strength: 0.7,
+  // disable_extra_networks: false,
+  // do_not_save_grid: false,
+  // do_not_save_samples: false,
+  // enable_hr: true,
+  // n_iter: 1,
+  // negative_prompt: '',
+  // override_settings: {},
+  // override_settings_restore_afterwards: true,
+  // restore_faces: false,
+  // s_churn: 0.0,
+  // s_min_uncond: 0,
+  // s_noise: 1.0,
+  // s_tmax: null,
+  // s_tmin: 0.0,
+  // // sampler_name: 'DPM++ 2M Karras',
+  // script_args: [],
+  // script_name: null,
+  // seed: -1,
+  // seed_enable_extras: true,
+  // seed_resize_from_h: -1,
+  // seed_resize_from_w: -1,
+  // styles: [],
+  // subseed: -1,
+  // subseed_strength: 0,
+  // tiling: false
+  // hr_negative_prompt: '',
+  // hr_prompt:
+  //   'scooter,simple,no people,parked in front of an art gallery,sunny,white background,realistic photo,best quality,detailed texture,super detail,ultra realistic material,--ar 3:2 --q 2 --v 5,<lora:scooter:1>,',
+  // hr_resize_x: 0,
+  // hr_resize_y: 0,
+  hr_scale: 2
+  // hr_second_pass_steps: 0,
+  // hr_upscaler: 'Latent',
 })
 
 const createImgList = ref()
 function create() {
   let base64Data = canvas.toDataURL()
-  console.log(form.value.alwayson_scripts.args)
-  form.value.alwayson_scripts.controlnet.args[0].input_image = base64Data
+  form.value.alwayson_scripts.controlnet.args[0].input_image.image = base64Data
+  form.value.alwayson_scripts.controlnet.args[0].input_image.mask = base64Data
   console.log(base64Data)
-  // createGallery()
-  // gallery.show()
-  // return
+
+  const requertParams = JSON.parse(JSON.stringify(form.value))
+  if (LorasText.value) {
+    requertParams.prompt = `${requertParams.prompt}<lora:${LorasText.value}:1>`
+  }
 
   let loading = ElLoading.service({
     lock: true,
@@ -196,7 +240,7 @@ function create() {
   })
   request
     .post(`/sdapi/v1/txt2img`, {
-      ...form.value
+      ...requertParams
     })
     .then((res) => {
       createImgList.value = res.images.map((item) => `data:image/jpeg;base64,${item}`)
@@ -209,6 +253,21 @@ function create() {
         }
         createGallery()
         gallery.show()
+
+        // 添加元素
+
+        let toolBar = document.querySelector('.viewer-toolbar>ul')
+        let liDom = document.createElement('li')
+        liDom.style.backgroundImage = `url(${reSetImg})`
+        liDom.style.backgroundSize = '20px 20px'
+        liDom.style.backgroundPosition = 'center'
+        toolBar.appendChild(liDom)
+        liDom.addEventListener('click', () => {
+          canvas.clear()
+          layers.value = []
+          addLayerWithImage(gallery.image.src)
+          gallery.hide()
+        })
       })
     })
 }
@@ -225,16 +284,7 @@ function getLoras() {
   request.get('/sdapi/v1/loras').then((res) => {
     console.log('loras列表', res)
     LorasList.value = res
-    LorasList.value = [
-      {
-        label: '测试',
-        value: 33
-      },
-      {
-        label: '测试2',
-        value: 35
-      }
-    ]
+    LorasList.value = loraList
   })
 }
 

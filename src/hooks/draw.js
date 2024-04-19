@@ -3,7 +3,8 @@ import { fabric } from 'fabric-with-erasing'
 import { v4 as uuidv4 } from 'uuid'
 import { ref, reactive } from 'vue'
 export let canvas
-
+// 创建图层数组
+export let layers = ref([])
 let color = '#000000'
 let pencliWidth = 10
 let eraserWidth = 10
@@ -224,8 +225,6 @@ export function moveimage() {
   canvas.isDrawingMode = false
 }
 
-// 创建图层数组
-export let layers = ref([])
 // 添加新图层函数
 export function addLayer(img) {
   let layer = new fabric.Group([], {
@@ -275,7 +274,7 @@ export function hiddenLayer(index, acitveindex) {
   canvas.requestRenderAll()
 }
 
-let activeLayer
+export let activeLayer
 // 切换当前活动图层函数
 export function setActiveLayer(index) {
   return new Promise((reslove, reject) => {
@@ -305,12 +304,12 @@ export function setLayerOrder() {
 
 // 移动图层到指定层级
 export function moveLayerToIndex(targetIndex, id) {
-  // layers.value.forEach(function (layer) {
-  //   canvas.remove(layer)
-  // })
-  // layers.value.forEach(function (layer) {
-  //   canvas.add(layer)
-  // })
+  layers.value.forEach(function (layer) {
+    canvas.remove(layer)
+  })
+  layers.value.forEach(function (layer) {
+    canvas.add(layer)
+  })
   canvas.requestRenderAll()
 }
 
@@ -330,5 +329,6 @@ export function addLayerWithImage(base64Image) {
 
     addLayer(img)
     canvas.requestRenderAll()
+    setActiveLayer(0)
   })
 }

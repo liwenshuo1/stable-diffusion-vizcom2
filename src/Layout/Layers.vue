@@ -76,6 +76,7 @@ import {
   moveLayerToIndex,
   addLayerWithImage,
   canvas,
+  activeLayer,
   deleteLayer,
   hiddenLayer
 } from '@/hooks/draw.js'
@@ -129,7 +130,7 @@ const dragOptions = reactive({
   ghostClass: 'ghost'
 })
 function endDrag(val, aaa) {
-  const activeindex = layers.value.findIndex((item) => item.id === canvas.getActiveObject().id)
+  const activeindex = layers.value.findIndex((item) => item.id === activeLayer.id)
   currentIndex.value = activeindex
   moveLayerToIndex(val.newIndex)
   isDragging.value = false
