@@ -14,6 +14,52 @@
       <el-select v-model="LorasText" placeholder="请选择">
         <el-option v-for="item in LorasList" :key="item.name" :label="item.name" :value="item.name" />
       </el-select>
+
+      <el-collapse>
+        <el-collapse-item>
+          <template #title>
+            <div>指导图片</div>
+          </template>
+          <el-upload
+            list-type="picture"
+            class="upload-demo"
+            drag
+            multiple
+            v-model:file-list="fileList"
+            :on-change="onChange"
+            :auto-upload="false"
+            action="#">
+            <template #trigger>
+              <div class="el-upload__text">
+                拖拽文件至此或
+                <em>点击上传</em>
+              </div>
+            </template>
+
+            <template #file="{ file }">
+              <div style="width: 100%; display: flex; justify-content: space-between; align-items: center">
+                <el-popover width="200px" placement="left" :offset="50" transition="none" trigger="click">
+                  <template #reference>
+                    <img
+                      @click="editrefImg = true"
+                      class="pointer"
+                      style="width: 35px; height: 25px"
+                      :src="file.url"
+                      alt="" />
+                  </template>
+                  <template #default>
+                    <img style="width: 100%; height: 170px" :src="file.url" alt="" />
+                    <h5 style="margin: 10px 0">影响程度</h5>
+                    <VueSlider @change="changeimgReference" v-bind="slider" v-model="file.reference"></VueSlider>
+                  </template>
+                </el-popover>
+
+                <el-icon class="pointer" @click="deleteImage(file)"><Close /></el-icon>
+              </div>
+            </template>
+          </el-upload>
+        </el-collapse-item>
+      </el-collapse>
       <el-divider />
 
       <div style="margin-bottom: 40px">图片张数</div>
@@ -76,6 +122,42 @@ import VueSlider from 'vue-slider-component'
 import { loraList } from '@/test/loarlist.js'
 import reSetImg from '@/assets/reSetImg.svg'
 console.log(reSetImg)
+
+// 第二个controlnet
+
+const fileList = ref([])
+function onChange(file, b, c) {
+  file.reference = 100
+}
+
+function getBase64(file) {
+  return new Promise(function (resolve, reject) {
+    let reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = function (event) {
+      const base64String = event.target.result
+      resolve(base64String)
+    }
+    reader.onerror = function (error) {
+      reject(error)
+    }
+  })
+}
+
+function deleteImage(file) {
+  let indexToDelete = fileList.value.findIndex(function (obj) {
+    return obj.uid === file.uid
+  })
+  // 如果找到了匹配的索引，则删除该对象
+  if (indexToDelete !== -1) {
+    fileList.value.splice(indexToDelete, 1)
+  }
+}
+
+function changeimgReference() {
+  // console.log(fileList.value)
+}
+
 // {
 //   "enable_hr": false,                 // 开启高清hr
 //   "denoising_strength": 0,            // 降噪强度
@@ -222,11 +304,29 @@ const form = ref({
 })
 
 const createImgList = ref()
-function create() {
+async function create() {
   let base64Data = canvas.toDataURL()
   form.value.alwayson_scripts.controlnet.args[0].input_image.image = base64Data
   form.value.alwayson_scripts.controlnet.args[0].input_image.mask = base64Data
-  console.log(base64Data)
+
+  if (fileList.value.length) {
+    // 第二个controlnet
+    const secondControlnet = (form.value.alwayson_scripts.controlnet.args[1] = {
+      enabled: true, // # 启用
+      control_mode: 'Balanced', // # 对应webui 的 Control Mode 可以直接填字符串 推荐使用下标 0 1 2
+      model: 'control_v11p_sd15_lineart [43d4be0d]', // # 对应webui 的 Model
+      module: 'lineart_standard (from white bg & black line)', //  # 对应webui 的 Preprocessor
+      input_image: {
+        image: '',
+        mask: ''
+      } //  # 图片 格式为base64
+    })
+
+    const secondImg = await getBase64(fileList.value[0].raw)
+    secondControlnet.input_image.image = secondImg
+    secondControlnet.input_image.mask = secondImg
+    secondControlnet.weight = fileList.value[0].reference / 100
+  }
 
   const requertParams = JSON.parse(JSON.stringify(form.value))
   if (LorasText.value) {
@@ -273,9 +373,9 @@ function create() {
 }
 
 function getModels() {
-  request.get('/sdapi/v1/sd-models').then((res) => {
-    console.log('模型列表', res)
-  })
+  // request.get('/sdapi/v1/sd-models').then((res) => {
+  //   console.log('模型列表', res)
+  // })
 }
 
 const LorasList = ref([])
@@ -284,7 +384,6 @@ function getLoras() {
   request.get('/sdapi/v1/loras').then((res) => {
     console.log('loras列表', res)
     LorasList.value = res
-    LorasList.value = loraList
   })
 }
 
@@ -354,5 +453,15 @@ getModels()
 
 .size-warp {
   display: flex;
+}
+
+.el-collapse {
+  .el-collapse-item__wrap {
+    border-bottom: none;
+  }
+  .el-collapse-item__header {
+    border-bottom: none;
+    color: #787575;
+  }
 }
 </style>
