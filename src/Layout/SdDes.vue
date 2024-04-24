@@ -105,7 +105,7 @@
 
     <div style="display: none">
       <ul id="images">
-        <li v-for="item in createImgList"><img :src="item" alt="Picture 1" /></li>
+        <li v-for="(item, index) in createImgList" :key="index"><img :src="item" alt="Picture 1" /></li>
       </ul>
     </div>
   </div>
@@ -121,6 +121,7 @@ import { canvas, layers, initCanvas, addLayerWithImage } from '@/hooks/draw.js'
 import VueSlider from 'vue-slider-component'
 import { loraList } from '@/test/loarlist.js'
 import reSetImg from '@/assets/reSetImg.svg'
+import OptimizeImages from '@/assets/icons/OptimizeImages.svg'
 console.log(reSetImg)
 
 // 第二个controlnet
@@ -353,8 +354,7 @@ async function create() {
         }
         createGallery()
         gallery.show()
-
-        // 添加元素
+        // 添加将图片再利用元素
 
         let toolBar = document.querySelector('.viewer-toolbar>ul')
         let liDom = document.createElement('li')
@@ -367,6 +367,40 @@ async function create() {
           layers.value = []
           addLayerWithImage(gallery.image.src)
           gallery.hide()
+        })
+
+        // 添加高清图片元素
+        let OptimizeImagesliDom = document.createElement('li')
+        OptimizeImagesliDom.style.backgroundImage = `url(${OptimizeImages})`
+        OptimizeImagesliDom.style.backgroundSize = '20px 20px'
+        OptimizeImagesliDom.style.backgroundPosition = 'center'
+        toolBar.appendChild(OptimizeImagesliDom)
+        OptimizeImagesliDom.addEventListener('click', () => {
+          console.log(gallery)
+          request
+            .post('/sdapi/v1/extra-single-image', {
+              resize_mode: 0,
+              show_extras_results: true,
+              gfpgan_visibility: 0,
+              codeformer_visibility: 0,
+              codeformer_weight: 0,
+              upscaling_resize: 2,
+              upscaling_resize_w: 512,
+              upscaling_resize_h: 512,
+              upscaling_crop: true,
+              upscaler_1: 'None',
+              upscaler_2: 'None',
+              extras_upscaler_2_visibility: 0,
+              upscale_first: false,
+              image: gallery.image.src
+            })
+            .then((res) => {
+              console.log(res)
+              createImgList.value[gallery.index] = `data:image/jpeg;base64,${res.image}`
+              setTimeout(() => {
+                gallery.update()
+              })
+            })
         })
       })
     })
