@@ -11,11 +11,13 @@
       <div class="tool">
         <SdDes v-show="activeName === 'sdDes'"></SdDes>
         <Layers v-show="activeName === 'layers'" />
+        <Pictures v-show="activeName === 'pictures'"></Pictures>
       </div>
 
       <aside class="aside">
         <SvgIcon class="pointer" name="create-img" @click="activeName = 'sdDes'" color="#ffffff"></SvgIcon>
         <SvgIcon class="pointer" name="layers" @click="activeName = 'layers'" color="#ffffff"></SvgIcon>
+        <SvgIcon class="pointer" name="pictures" @click="activeName = 'pictures'" color="#ffffff"></SvgIcon>
       </aside>
     </div>
   </div>
@@ -24,6 +26,7 @@
 <script setup>
 import SdDes from '@/Layout/SdDes.vue'
 import Layers from '@/Layout/Layers.vue'
+import Pictures from '@/Layout/Pictures.vue'
 import VicomHeader from '@/Layout/VicomHeader.vue'
 import HandlePanel from '@/Layout/HandlePanel.vue'
 import { onMounted, ref } from 'vue'
